@@ -1,0 +1,257 @@
+/* ─── Root ─── */
+.ns-root {
+  display: flex;
+  height: 100vh;
+  font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+  background: #f4f6fb;
+  overflow: hidden;
+}
+
+/* ─── Sidebar ─── */
+.ns-sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: #fff;
+  border-right: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+}
+
+.ns-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 14px 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.ns-logo-icon {
+  width: 34px;
+  height: 34px;
+  background: #eff6ff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.ns-logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ns-logo-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+}
+
+.ns-logo-sub {
+  font-size: 9px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.ns-sidebar-section {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  padding: 14px 16px 6px;
+}
+
+.ns-sidebar-nav {
+  flex: 1;
+  padding: 4px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ns-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.ns-sidebar-item:hover {
+  background: #f8fafc;
+  color: #334155;
+}
+
+.ns-sidebar-item.active {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.ns-sidebar-footer {
+  border-top: 1px solid #f0f0f0;
+  padding: 12px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ns-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ns-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fbbf24;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ns-user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ns-user-role {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.ns-user-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.ns-btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  color: #ef4444;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  width: 100%;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.ns-btn-logout:hover {
+  background: #fee2e2;
+}
+
+/* ─── Main ─── */
+.ns-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ─── Topbar ─── */
+.ns-topbar {
+  height: 52px;
+  background: #fff;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.ns-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 0;
+}
+
+.ns-topbar-room {
+  color: #374151;
+  font-weight: 500;
+}
+
+.ns-topbar-spec {
+  color: #0288d1;
+  font-weight: 600;
+}
+
+.ns-btn-change-room {
+  margin-left: 8px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.ns-btn-change-room:hover {
+  background: #dbeafe;
+}
+
+/* ─── Content ─── */
+.ns-content {
+  flex: 1;
+  min-height: 0;
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ns-content-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.ns-page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  white-space: nowrap;
+}

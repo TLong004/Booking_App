@@ -1,0 +1,143 @@
+.qd-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f0f6ff;
+}
+
+/* Topbar */
+.qd-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e0eaf5;
+}
+.qd-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.qd-current-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+.qd-current-num {
+  color: #0288d1;
+}
+.qd-remaining {
+  font-size: 13px;
+  color: #666;
+}
+.qd-btn-next {
+  background: #0288d1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background 0.15s;
+}
+.qd-btn-next:hover:not(:disabled) { background: #0277b5; }
+.qd-btn-next:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Board */
+.qd-board {
+  display: flex;
+  flex: 1;
+  border-bottom: 3px solid #222;
+}
+.qd-board-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 3px solid #222;
+  background: #f7fbff;
+  padding: 32px;
+}
+.qd-board-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+  background: #f7fbff;
+}
+.qd-board-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24px;
+}
+.qd-board-number {
+  font-size: 120px;
+  font-weight: 800;
+  color: #0288d1;
+  line-height: 1;
+  letter-spacing: -4px;
+}
+
+/* Next list */
+.qd-next-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.qd-next-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e0eaf5;
+}
+.qd-next-item--first {
+  border-color: #0288d1;
+  background: #e8f4fd;
+}
+.qd-next-stt {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0288d1;
+  min-width: 40px;
+}
+.qd-next-name {
+  font-size: 15px;
+  color: #333;
+}
+.qd-empty {
+  color: #aaa;
+  font-size: 14px;
+  padding: 16px 0;
+}
+
+/* Footer */
+.qd-footer {
+  padding: 20px;
+  text-align: center;
+  background: #f7fbff;
+}
+.qd-footer-hospital {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0288d1;
+  letter-spacing: 1px;
+}
+.qd-footer-khoa {
+  font-size: 16px;
+  color: #444;
+  margin-top: 4px;
+}
+.qd-footer-room {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 2px;
+}
