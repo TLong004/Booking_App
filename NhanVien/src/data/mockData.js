@@ -143,6 +143,186 @@ export const ADDRESS_DATA = {
   },
 };
 
+// Thêm đoạn này vào file src/data/mockData.js hiện có của bạn
+
+export const MOCK_EXAM_QUEUE = [
+  {
+    id: 'BN8C09434C',
+    confirmedAt: '18/01/2024 21:44:14',
+    status: 'done',
+    patient: {
+      name: 'Bạch Cao Kỳ',
+      gender: 'Nữ',
+      dob: '08/07/1997',
+      address: 'Tỉnh Tuyên Quang',
+      phone: '0993010171',
+    },
+    history: [
+      { date: '05/01/2024', specialty: 'Răng - hàm - mặt' },
+      { date: '12/11/2023', specialty: 'Nội khoa' },
+    ],
+  },
+  {
+    id: 'BN3A12001B',
+    confirmedAt: '18/01/2024 22:10:05',
+    status: 'waiting',
+    patient: {
+      name: 'Nguyễn Văn An',
+      gender: 'Nam',
+      dob: '15/03/1990',
+      address: 'Hà Nội',
+      phone: '0912345678',
+    },
+    history: [
+      { date: '01/12/2023', specialty: 'Tai - mũi - họng' },
+    ],
+  },
+  {
+    id: 'BN7F55810D',
+    confirmedAt: '18/01/2024 22:35:48',
+    status: 'waiting',
+    patient: {
+      name: 'Trần Thị Bích',
+      gender: 'Nữ',
+      dob: '22/09/2001',
+      address: 'TP. Hồ Chí Minh',
+      phone: '0987654321',
+    },
+    history: [],
+  },
+  {
+    id: 'BN2D33901E',
+    confirmedAt: '18/01/2024 22:50:00',
+    status: 'waiting',
+    patient: {
+      name: 'Võ Thành Đạt',
+      gender: 'Nam',
+      dob: '01/01/1995',
+      address: 'Đà Nẵng',
+      phone: '0911222333',
+    },
+    history: [],
+  },
+  {
+    id: 'BN5E77203F',
+    confirmedAt: '18/01/2024 23:00:11',
+    status: 'done',
+    patient: {
+      name: 'Ngô Thị Hoa',
+      gender: 'Nữ',
+      dob: '17/09/1988',
+      address: 'Cần Thơ',
+      phone: '0944555666',
+    },
+    history: [
+      { date: '10/10/2023', specialty: 'Nội khoa' },
+    ],
+  },
+  {
+    id: 'BN1A00512G',
+    confirmedAt: '18/01/2024 23:10:05',
+    status: 'waiting',
+    patient: {
+      name: 'Đinh Quốc Hùng',
+      gender: 'Nam',
+      dob: '25/04/1980',
+      address: 'Hải Phòng',
+      phone: '0966777888',
+    },
+    history: [
+      { date: '03/08/2023', specialty: 'Cơ xương khớp' },
+      { date: '15/05/2023', specialty: 'Nội khoa' },
+    ],
+  },
+  {
+    id: 'BN9B12340H',
+    confirmedAt: '18/01/2024 23:18:30',
+    status: 'waiting',
+    patient: {
+      name: 'Lý Thị Kim Ngân',
+      gender: 'Nữ',
+      dob: '11/12/2002',
+      address: 'Bình Dương',
+      phone: '0977888999',
+    },
+    history: [],
+  },
+  {
+    id: 'BN4C56781I',
+    confirmedAt: '18/01/2024 23:25:00',
+    status: 'done',
+    patient: {
+      name: 'Trương Văn Phúc',
+      gender: 'Nam',
+      dob: '30/06/1972',
+      address: 'Long An',
+      phone: '0988999000',
+    },
+    history: [
+      { date: '20/11/2023', specialty: 'Tim mạch' },
+    ],
+  },
+  {
+    id: 'BN6D89012J',
+    confirmedAt: '18/01/2024 23:33:45',
+    status: 'waiting',
+    patient: {
+      name: 'Phan Thị Lan',
+      gender: 'Nữ',
+      dob: '05/03/1993',
+      address: 'Vũng Tàu',
+      phone: '0922111222',
+    },
+    history: [
+      { date: '14/09/2023', specialty: 'Da liễu' },
+    ],
+  },
+  {
+    id: 'BN8F23456K',
+    confirmedAt: '18/01/2024 23:40:00',
+    status: 'waiting',
+    patient: {
+      name: 'Bùi Minh Tuấn',
+      gender: 'Nam',
+      dob: '19/08/1999',
+      address: 'Nghệ An',
+      phone: '0933222333',
+    },
+    history: [],
+  },
+  {
+    id: 'BN3G45678L',
+    confirmedAt: '18/01/2024 23:47:20',
+    status: 'done',
+    patient: {
+      name: 'Đặng Thị Mỹ Linh',
+      gender: 'Nữ',
+      dob: '28/02/1986',
+      address: 'Huế',
+      phone: '0955444555',
+    },
+    history: [
+      { date: '07/07/2023', specialty: 'Răng - hàm - mặt' },
+      { date: '01/03/2023', specialty: 'Tai - mũi - họng' },
+    ],
+  },
+  {
+    id: 'BN7H67890M',
+    confirmedAt: '18/01/2024 23:55:00',
+    status: 'waiting',
+    patient: {
+      name: 'Hồ Văn Sơn',
+      gender: 'Nam',
+      dob: '10/10/1975',
+      address: 'Quảng Nam',
+      phone: '0900123456',
+    },
+    history: [
+      { date: '22/06/2023', specialty: 'Nội khoa' },
+    ],
+  },
+];
+
 // ─────────────────── form constants ───────────────────
 export const DAN_TOC = ['Kinh', 'Tày', 'Thái', 'Mường', 'Khmer', 'Mông', 'Nùng', 'Hoa', 'Dao', 'Gia Rai', 'Khác'];
 export const GIOI_TINH = ['Nam', 'Nữ', 'Khác'];

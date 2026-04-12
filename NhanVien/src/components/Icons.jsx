@@ -102,6 +102,37 @@ const Icons = {
       <circle cx="4" cy="2" r="1" fill="currentColor"/>
     </svg>
   ),
+
+   Clock: () => (
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+      <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.2"/>
+      <path d="M6.5 3.5v3l2 1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+    </svg>
+  ),
+  Pin: () => (
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+      <path d="M6.5 1A4 4 0 002.5 5c0 3 4 7 4 7s4-4 4-7a4 4 0 00-4-4z" stroke="currentColor" strokeWidth="1.2"/>
+      <circle cx="6.5" cy="5" r="1.5" stroke="currentColor" strokeWidth="1.1"/>
+    </svg>
+  ),
+  ChevronDown: ({ open }) => (
+    <svg
+      style={{ transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}
+      width="11" height="11" viewBox="0 0 11 11" fill="none"
+    >
+      <path d="M2 3.5l3.5 3.5 3.5-3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+    </svg>
+  ),
+  ChevronRight: () => (
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+      <path d="M3 2l4 3.5-4 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+    </svg>
+  ),
+  ArrowLeft: () => (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
 };
 
 export default Icons;

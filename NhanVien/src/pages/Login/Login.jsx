@@ -56,6 +56,7 @@ const HospitalIllustration = () => (
 const TEST_ACCOUNTS = [
   { phone: '0111111111', password: '123456', name: 'Nguyễn Thị Lan', role: 'receptionist' },
   { phone: '0222222222', password: '123456', name: 'BS. Trần Văn Minh', role: 'doctor' },
+  { phone: '0333333333', password: '123456', name: 'TK. Toản', role: 'truong_khoa' },
 ];
 
 const Login = () => {

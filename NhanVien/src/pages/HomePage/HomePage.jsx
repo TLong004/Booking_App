@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 import RoomPickerModal from '../../components/RoomPickerModal';
+import ShiftPickerModal from '../../components/Shiftpickermodal ';
 
-// Menu theo role
+// ─── Menu theo role ───────────────────────────────────────────────────────────
 const ROLE_MENUS = {
   receptionist: [
     {
@@ -27,7 +28,7 @@ const ROLE_MENUS = {
           <rect x="8" y="8" width="3" height="3" rx="0.5" stroke="currentColor" strokeWidth="1.2"/>
         </svg>
       ),
-      action: 'room-picker', // dùng action thay vì path
+      action: 'room-picker',
     },
   ],
   doctor: [
@@ -39,7 +40,31 @@ const ROLE_MENUS = {
           <path d="M2 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
         </svg>
       ),
-      path: '/kham-chua-benh',
+      action: 'shift-picker',
+    },
+    {
+      label: 'Lịch trực',
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <rect x="1" y="2" width="13" height="12" rx="2" stroke="currentColor" strokeWidth="1.4"/>
+          <path d="M1 6h13" stroke="currentColor" strokeWidth="1.4"/>
+          <path d="M5 1v2M10 1v2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+          <path d="M4 9h3M4 11.5h5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+        </svg>
+      ),
+      path: '/lich-truc',
+    },
+  ],
+  truong_khoa: [
+    {
+      label: 'Khám chữa bệnh',
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <circle cx="7.5" cy="5" r="3" stroke="currentColor" strokeWidth="1.4"/>
+          <path d="M2 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+        </svg>
+      ),
+      action: 'shift-picker',
     },
     {
       label: 'Lịch trực',
@@ -71,18 +96,22 @@ const ROLE_MENUS = {
 const ROLE_LABELS = {
   receptionist: 'Tiếp tân',
   doctor: 'Bác sĩ',
+  truong_khoa: 'Trưởng khoa',
 };
 
 const ROLE_COLORS = {
   receptionist: { bg: '#f0fdf4', text: '#166534', border: '#bbf7d0' },
-  doctor: { bg: '#eff6ff', text: '#1e40af', border: '#bfdbfe' },
+  doctor:       { bg: '#eff6ff', text: '#1e40af', border: '#bfdbfe' },
+  truong_khoa:  { bg: '#fdf4ff', text: '#6b21a8', border: '#e9d5ff' },
 };
 
+// ─── Component ────────────────────────────────────────────────────────────────
 const HomePage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showRoomPicker, setShowRoomPicker] = useState(false);
+  const [showRoomPicker, setShowRoomPicker]   = useState(false); // tiếp tân
+  const [showShiftPicker, setShowShiftPicker] = useState(false); // bác sĩ / trưởng khoa
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -110,24 +139,33 @@ const HomePage = () => {
     setDropdownOpen(false);
     if (item.action === 'room-picker') {
       setShowRoomPicker(true);
+    } else if (item.action === 'shift-picker') {
+      setShowShiftPicker(true);
     } else if (item.path) {
       navigate(item.path);
     }
   };
 
+  // Tiếp tân chọn phòng xong → lưu / điều hướng tuỳ business logic
   const handleRoomSelect = (room) => {
-    // Có thể navigate đến trang phòng khám với thông tin đã chọn
-    console.log('Phòng đã chọn:', room);
+    console.log('Phòng đã chọn (tiếp tân):', room);
     setShowRoomPicker(false);
   };
 
+  // Bác sĩ / trưởng khoa chọn ca xong → điều hướng vào trang khám
+  const handleShiftSelect = (shift) => {
+    // shift = 'Buổi sáng' | 'Buổi chiều'
+    setShowShiftPicker(false);
+    navigate('/kham-benh', { state: { shift } });
+  };
+
   const roleMenuItems = user ? ROLE_MENUS[user.role] || [] : [];
-  const roleColor = user ? ROLE_COLORS[user.role] : null;
+  const roleColor     = user ? ROLE_COLORS[user.role] : null;
 
   return (
     <div className="home-page">
 
-      {/* Navbar */}
+      {/* ── Navbar ── */}
       <nav className="navbar">
         <div className="navbar-logo">
           <span className="logo-title">THEDUCK</span>
@@ -168,8 +206,8 @@ const HomePage = () => {
                     className="dropdown-role-badge"
                     style={{
                       background: roleColor?.bg,
-                      color: roleColor?.text,
-                      border: `1px solid ${roleColor?.border}`,
+                      color:      roleColor?.text,
+                      border:     `1px solid ${roleColor?.border}`,
                     }}
                   >
                     {ROLE_LABELS[user.role]}
@@ -195,7 +233,8 @@ const HomePage = () => {
                 {/* Đăng xuất */}
                 <button className="dropdown-item logout" onClick={handleLogout}>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M5 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3M9 10l3-3-3-3M12 7H5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M5 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3M9 10l3-3-3-3M12 7H5"
+                      stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                   Đăng xuất
                 </button>
@@ -203,16 +242,13 @@ const HomePage = () => {
             )}
           </div>
         ) : (
-          <button
-            className="btn-login-nav"
-            onClick={() => navigate('/login')}
-          >
+          <button className="btn-login-nav" onClick={() => navigate('/login')}>
             ĐĂNG NHẬP
           </button>
         )}
       </nav>
 
-      {/* Hero section */}
+      {/* ── Hero ── */}
       <section className="hero">
         <div className="deco deco-1" />
         <div className="deco deco-2" />
@@ -228,10 +264,7 @@ const HomePage = () => {
               Người có sức khoẻ là người có hy vọng, người có hy vọng là người có tất cả.
               Hãy trao cho chúng tôi niềm tin — chúng tôi sẽ trao lại cho bạn hy vọng.
             </p>
-            <button
-              className="btn-hero"
-              onClick={() => navigate('/gioi-thieu')}
-            >
+            <button className="btn-hero" onClick={() => navigate('/gioi-thieu')}>
               Tìm hiểu về chúng tôi
             </button>
           </div>
@@ -239,20 +272,24 @@ const HomePage = () => {
 
         <div className="hero-right">
           <div className="hero-img-wrap">
-            <img
-              src="/assets/doctor.png"
-              alt="Bác sĩ"
-              className="hero-img"
-            />
+            <img src="/assets/doctor.png" alt="Bác sĩ" className="hero-img" />
           </div>
         </div>
       </section>
 
-      {/* Room Picker Modal */}
+      {/* ── Modal: Tiếp tân chọn phòng ── */}
       {showRoomPicker && (
         <RoomPickerModal
           onClose={() => setShowRoomPicker(false)}
           onSelect={handleRoomSelect}
+        />
+      )}
+
+      {/* ── Modal: Bác sĩ / Trưởng khoa chọn ca trực ── */}
+      {showShiftPicker && (
+        <ShiftPickerModal
+          onClose={() => setShowShiftPicker(false)}
+          onSelect={handleShiftSelect}
         />
       )}
 

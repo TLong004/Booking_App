@@ -1,0 +1,225 @@
+/* ── MedicalExamPage.css — Shell layout (không thay đổi) ── */
+
+/* ── Root layout ── */
+.mep-root {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: #f0f4f8;
+}
+
+/* ── Sidebar ── */
+.mep-sidebar {
+  width: 228px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 1px solid #e8edf2;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Logo */
+.mep-sidebar-logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.mep-logo-box { display: flex; flex-direction: column; gap: 4px; }
+
+.mep-logo-duck {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1d4ed8;
+  letter-spacing: 1px;
+}
+
+.mep-logo-tagline {
+  font-size: 10.5px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+/* Section label */
+.mep-sidebar-section {
+  padding: 16px 18px 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #cbd5e1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Nav */
+.mep-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 10px;
+  flex: 1;
+}
+
+.mep-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  color: #64748b;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.mep-sidebar-item svg { opacity: 0.7; flex-shrink: 0; }
+.mep-sidebar-item:hover { background: #f1f5f9; color: #1e293b; }
+.mep-sidebar-item:hover svg { opacity: 1; }
+
+.mep-sidebar-item.active {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+  border-left: 3px solid #1d4ed8;
+  padding-left: 7px;
+}
+
+.mep-sidebar-item.active svg { opacity: 1; }
+
+/* Footer */
+.mep-sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid #f0f4f8;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mep-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px;
+  border-radius: 9px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+}
+
+.mep-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mep-user-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.mep-user-role { font-size: 10px; color: #94a3b8; text-transform: capitalize; }
+.mep-user-name { font-size: 13px; font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.mep-btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: none;
+  background: none;
+  font-size: 12.5px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  font-weight: 500;
+  width: 100%;
+}
+
+.mep-btn-logout:hover { background: #fff1f2; color: #e11d48; }
+
+/* ── Main ── */
+.mep-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* Topbar */
+.mep-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 52px;
+  border-bottom: 1px solid #e8edf2;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.mep-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.mep-topbar-shift {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 99px;
+}
+
+/* Shift variants — applied inline via style prop */
+/* Buổi sáng: background #fef3c7 border #fde68a */
+/* Buổi chiều: background #ede9fe border #ddd6fe */
+
+/* ── Content area ── */
+.mep-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+}
+
+/* Queue list */
+.mep-title-row { margin-bottom: 18px; }
+
+.mep-page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.mep-queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mep-empty {
+  text-align: center;
+  padding: 60px 0;
+  color: #94a3b8;
+  font-size: 14px;
+  background: #fff;
+  border: 1px dashed #e2e8f0;
+  border-radius: 12px;
+}
