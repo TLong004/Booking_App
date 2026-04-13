@@ -6,6 +6,7 @@ import NurseStationPage from '../pages/NurseStationPage/NurseStationPage';
 import MedicalExamPage from '../pages/MedicalExamPage/MedicalExamPage';
 import ExamQueuePage from '../pages/MedicalExamPage/Examqueuepage';
 import SchedulePage from '../pages/MedicalExamPage/Schedulepage';
+import ExamPage from '../pages/MedicalExamPage/Exampage';
 
 const AppRouter = () => {
   return (
@@ -17,6 +18,7 @@ const AppRouter = () => {
       <Route path="/nurse-station" element={<NurseStationPage />} />
       <Route path="/kham-benh" element={<MedicalExamPage />}>
         <Route index element={<ExamQueuePage />} />
+        <Route path="kham" element={<ExamPage />} />
         <Route path="lich-truc" element={<SchedulePage />} />
       </Route>
     </Routes>

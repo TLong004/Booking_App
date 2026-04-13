@@ -109,11 +109,15 @@ export const BAC_SI_DATA = {
 };
 
 export const MOCK_QUEUE = [
-  { stt: 1,  ma: 'DK240001', hoTen: 'Nguyễn Văn An',  gioiTinh: 'Nam', ngaySinh: '15/03/1985', sdt: '0912345678', trangThai: 'Đang chờ' },
-  { stt: 2,  ma: 'DK240002', hoTen: 'Trần Thị Bình',  gioiTinh: 'Nữ',  ngaySinh: '22/07/1990', sdt: '0987654321', trangThai: 'Đang khám' },
-  { stt: 3,  ma: 'DK240003', hoTen: 'Lê Minh Cường',  gioiTinh: 'Nam', ngaySinh: '08/11/1978', sdt: '0901234567', trangThai: 'Đang chờ' },
-  { stt: 4,  ma: 'DK240004', hoTen: 'Phạm Thị Dung',  gioiTinh: 'Nữ',  ngaySinh: '30/01/2000', sdt: '0934567890', trangThai: 'Đang chờ' },
-  { stt: 5,  ma: 'DK240005', hoTen: 'Hoàng Văn Em',   gioiTinh: 'Nam', ngaySinh: '14/06/1965', sdt: '0956789012', trangThai: 'Đã khám' },
+  { id: 'STT-001', patientId: 'BN-2025-014', name: 'Trần Thị Bích Ngọc', gender: 'Nữ',  dob: '12/03/1997', address: 'Thành phố Hà Nội',     reason: 'Đau răng hàm trên bên phải',         checkedIn: '07:42', status: 'waiting' },
+  { id: 'STT-002', patientId: 'BN-2025-021', name: 'Lê Minh Tuấn',        gender: 'Nam', dob: '05/07/1990', address: 'Tỉnh Hải Dương',        reason: 'Chảy máu chân răng kéo dài',         checkedIn: '07:55', status: 'examining' },
+  { id: 'STT-003', patientId: 'BN-2025-008', name: 'Nguyễn Thị Hà',       gender: 'Nữ',  dob: '20/11/1985', address: 'Tỉnh Tuyên Quang',      reason: 'Đau nhức toàn bộ hàm dưới, sưng má', checkedIn: '08:10', status: 'waiting' },
+  { id: 'STT-004', patientId: 'BN-2025-033', name: 'Phạm Văn Đức',        gender: 'Nam', dob: '14/02/1978', address: 'TP. Hồ Chí Minh',       reason: 'Kiểm tra định kỳ 6 tháng',           checkedIn: '08:22', status: 'waiting' },
+  { id: 'STT-005', patientId: 'BN-2025-011', name: 'Phạm Hoàng Long',     gender: 'Nam', dob: '08/09/2000', address: 'Tỉnh Bắc Giang',        reason: 'Răng cửa trên bị vỡ do chấn thương', checkedIn: '08:35', status: 'waiting' },
+  { id: 'STT-006', patientId: 'BN-2025-045', name: 'Võ Thị Lan',          gender: 'Nữ',  dob: '30/06/1995', address: 'Thành phố Đà Nẵng',     reason: 'Nhổ răng theo yêu cầu',              checkedIn: '08:50', status: 'waiting' },
+  { id: 'STT-007', patientId: 'BN-2025-017', name: 'Đặng Quốc Hùng',     gender: 'Nam', dob: '17/12/1988', address: 'Tỉnh Nghệ An',          reason: 'Đau buốt khi uống nước lạnh',        checkedIn: '09:05', status: 'examining' },
+  { id: 'STT-008', patientId: 'BN-2025-052', name: 'Hoàng Thị Thu',       gender: 'Nữ',  dob: '03/04/1993', address: 'Thành phố Hà Nội',     reason: 'Mọc răng khôn đau nhức',             checkedIn: '09:18', status: 'waiting' },
+  { id: 'STT-009', patientId: 'BN-2025-028', name: 'Bùi Văn Nam',         gender: 'Nam', dob: '22/08/1982', address: 'Tỉnh Thanh Hoá',        reason: 'Răng lung lay, muốn nhổ',            checkedIn: '09:30', status: 'waiting' },
 ];
 
 // ─────────────────── address data ───────────────────

@@ -1,0 +1,92 @@
+/* Container bọc ngoài - Phải chiếm trọn không gian của trang cha */
+.ep-embed-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;       /* Lấy 100% chiều cao vùng chứa của trang cha */
+  width: 100%;
+  background-color: #f1f3f6;
+  overflow: hidden;   /* Chặn cuộn ở đây để ép cuộn vào vùng area */
+  position: absolute; /* Quan trọng nếu trang cha là relative */
+  top: 0; left: 0; bottom: 0; right: 0;
+}
+
+/* Header cố định phía trên */
+.ep-header-fixed {
+  padding: 16px 24px;
+  background: #f1f3f6;
+  flex-shrink: 0; /* Không cho header bị co lại */
+}
+
+.ep-back-btn {
+  background: none; border: none; display: flex; align-items: center; gap: 8px;
+  color: #64748b; font-weight: 600; cursor: pointer; font-size: 14px;
+}
+
+/* VÙNG CUỘN CHÍNH - Đây là nơi thực hiện Scroll */
+.ep-scroll-area {
+  flex: 1;            /* Chiếm toàn bộ không gian còn lại */
+  overflow-y: auto;   /* Hiện thanh cuộn ở đây */
+  padding: 0 24px 40px 24px;
+}
+
+/* Layout Grid */
+.ep-layout-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  max-width: 1300px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.ep-card {
+  background: white; border-radius: 12px; border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Sidebar */
+.ep-p-header { padding: 20px; display: flex; gap: 12px; align-items: center; border-bottom: 1px solid #f1f5f9; }
+.ep-p-avatar { width: 44px; height: 44px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #94a3b8; }
+.ep-p-name { font-weight: 700; font-size: 15px; }
+.ep-p-details { padding: 15px 20px; display: flex; flex-direction: column; gap: 10px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+.ep-p-item { display: flex; gap: 10px; color: #475569; }
+.ep-p-item span { color: #94a3b8; width: 75px; }
+
+/* History */
+.ep-history-label { padding: 12px 20px; font-size: 12px; font-weight: 700; color: #0ea5e9; display: flex; gap: 8px; }
+.ep-history-card { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid #f8fafc; }
+.ep-history-card:hover { background: #f0f9ff; }
+.ep-h-date { font-size: 13px; font-weight: 600; color: #334155; }
+.ep-h-spec { font-size: 11px; color: #94a3b8; }
+
+/* Main Content */
+.ep-main-card { padding: 32px; }
+.ep-title { margin: 0 0 24px 0; font-size: 20px; font-weight: 700; }
+.ep-form-stack { display: flex; flex-direction: column; gap: 24px; }
+
+/* Outline Field */
+.ep-outline-field { position: relative; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; }
+.ep-outline-field label { position: absolute; top: -9px; left: 10px; background: white; padding: 0 6px; font-size: 11px; font-weight: 700; color: #64748b; }
+.ep-outline-field input { width: 100%; border: none; outline: none; font-size: 14px; }
+
+.ep-reexam-bar { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+.ep-date-input { border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; font-size: 13px; }
+
+/* Section & Table */
+.ep-section { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+.ep-sec-btn { padding: 14px 20px; background: #f8fafc; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e2e8f0; }
+.ep-sec-content { padding: 16px; }
+
+.ep-quick-add { display: flex; gap: 10px; margin-bottom: 16px; }
+.ep-quick-add input { flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
+.ep-quick-add button { background: #334155; color: white; border: none; padding: 0 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
+.ep-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ep-table th { text-align: left; padding: 10px; color: #64748b; border-bottom: 1px solid #f1f5f9; }
+.ep-table td { padding: 12px 10px; border-bottom: 1px solid #f8fafc; }
+.ep-del-row { background: #fff1f0; color: #ff4d4f; border: none; padding: 6px; border-radius: 6px; cursor: pointer; }
+
+/* Actions */
+.ep-form-actions { margin-top: 32px; display: flex; justify-content: flex-end; gap: 12px; }
+.ep-btn-draft { padding: 10px 24px; border: 1px solid #cbd5e1; background: white; border-radius: 8px; font-weight: 600; cursor: pointer; color: #475569; }
+.ep-btn-finish { padding: 10px 24px; background: #16a34a; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
