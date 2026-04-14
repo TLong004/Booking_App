@@ -223,3 +223,24 @@
   border: 1px dashed #e2e8f0;
   border-radius: 12px;
 }
+
+/* Đường kẻ phân cách menu */
+.mep-sidebar-divider {
+  height: 1px;
+  background: #f0f4f8;
+  margin: 10px 18px;
+}
+
+/* Label nhỏ hơn cho phần quản lý */
+.mep-sidebar-section.small {
+  font-size: 8.5px;
+  padding-top: 4px;
+}
+
+/* Hiệu ứng khi menu con hoạt động */
+.mep-sidebar-item.active {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+  border-left: 3px solid #1d4ed8;
+}

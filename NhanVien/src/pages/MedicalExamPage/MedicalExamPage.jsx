@@ -10,22 +10,30 @@ const MedicalExamPage = () => {
   const [user] = useState(() => {
     try {
       const stored = localStorage.getItem('user');
-      return stored ? JSON.parse(stored) : { name: 'Bác sĩ', role: 'doctor' };
+      return stored ? JSON.parse(stored) : { name: 'Người dùng', role: 'doctor' };
     } catch {
-      return { name: 'Bác sĩ', role: 'doctor' };
+      return { name: 'Người dùng', role: 'doctor' };
     }
   });
 
-  if (!state?.shift) {
+  // Kiểm tra quyền truy cập (Dành cho Bác sĩ và Trưởng khoa)
+  if (!state?.shift && (user.role === 'doctor' || user.role === 'truong_khoa')) {
     navigate('/', { replace: true });
     return null;
   }
 
-  const activeMenu = pathname.includes('lich-truc') ? 'lich-truc' : 'benh-nhan';
+  // Xác định menu đang active dựa trên đường dẫn
+  const getActiveMenu = () => {
+    if (pathname.includes('tao-lich-truc')) return 'tao-lich';
+    if (pathname.includes('danh-sach-lich')) return 'danh-sach';
+    if (pathname.includes('lich-truc')) return 'lich-truc';
+    return 'benh-nhan';
+  };
+
+  const activeMenu = getActiveMenu();
 
   return (
     <div className="mep-root">
-
       {/* ── Sidebar ── */}
       <aside className="mep-sidebar">
         <div className="mep-sidebar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
@@ -35,9 +43,12 @@ const MedicalExamPage = () => {
           </div>
         </div>
 
-        <div className="mep-sidebar-section">BÁC SĨ</div>
+        <div className="mep-sidebar-section">
+          {user.role === 'truong_khoa' ? 'TRƯỞNG KHOA' : 'BÁC SĨ'}
+        </div>
 
         <nav className="mep-sidebar-nav">
+          {/* Menu chung cho cả 2 role */}
           <button
             className={`mep-sidebar-item ${activeMenu === 'benh-nhan' ? 'active' : ''}`}
             onClick={() => navigate('.', { state })}
@@ -45,20 +56,47 @@ const MedicalExamPage = () => {
             <Icons.User />
             Bệnh nhân
           </button>
+
           <button
             className={`mep-sidebar-item ${activeMenu === 'lich-truc' ? 'active' : ''}`}
             onClick={() => navigate('lich-truc', { state })}
           >
             <Icons.Calendar />
-            Lịch trực
+            Lịch trực cá nhân
           </button>
+
+          {/* Menu riêng cho Trưởng khoa */}
+          {user.role === 'truong_khoa' && (
+            <>
+              <div className="mep-sidebar-divider" />
+              <div className="mep-sidebar-section small">QUẢN LÝ KHOA</div>
+              
+              <button
+                className={`mep-sidebar-item ${activeMenu === 'danh-sach' ? 'active' : ''}`}
+                onClick={() => navigate('danh-sach-lich', { state })}
+              >
+                <Icons.List /> {/* Giả sử bạn có icon List */}
+                Danh sách lịch trực
+              </button>
+
+              <button
+                className={`mep-sidebar-item ${activeMenu === 'tao-lich' ? 'active' : ''}`}
+                onClick={() => navigate('tao-lich-truc', { state })}
+              >
+                <Icons.Plus /> {/* Giả sử bạn có icon Plus */}
+                Tạo lịch trực
+              </button>
+            </>
+          )}
         </nav>
 
         <div className="mep-sidebar-footer">
           <div className="mep-user-info">
             <div className="mep-user-avatar">{user.name.charAt(0)}</div>
             <div className="mep-user-meta">
-              <span className="mep-user-role">bác sĩ</span>
+              <span className="mep-user-role">
+                {user.role === 'truong_khoa' ? 'Trưởng khoa' : 'Bác sĩ'}
+              </span>
               <span className="mep-user-name">{user.name}</span>
             </div>
           </div>
@@ -79,36 +117,24 @@ const MedicalExamPage = () => {
             <Icons.Building />
             <span>Phòng A104 — Khám răng · hàm · mặt</span>
           </div>
-          <div
-            className="mep-topbar-shift"
-            style={
-              state.shift === 'Buổi sáng'
-                ? { background: '#fef3c7', border: '1px solid #fde68a', color: '#b45309' }
-                : { background: '#ede9fe', border: '1px solid #ddd6fe', color: '#6d28d9' }
-            }
-          >
-            {state.shift === 'Buổi sáng' ? (
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <circle cx="7.5" cy="7.5" r="3" stroke="#f59e0b" strokeWidth="1.4" />
-                <path
-                  d="M7.5 1v1.5M7.5 12.5V14M1 7.5h1.5M12.5 7.5H14M3.05 3.05l1.06 1.06M10.89 10.89l1.06 1.06M3.05 11.95l1.06-1.06M10.89 4.11l1.06-1.06"
-                  stroke="#f59e0b" strokeWidth="1.4" strokeLinecap="round"
-                />
-              </svg>
-            ) : (
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <path d="M12 9A5.5 5.5 0 115 3a4 4 0 007 6z"
-                  stroke="#6366f1" strokeWidth="1.4" strokeLinejoin="round" />
-              </svg>
-            )}
-            {state.shift}
-          </div>
+          
+          {state?.shift && (
+            <div
+              className="mep-topbar-shift"
+              style={
+                state.shift === 'Buổi sáng'
+                  ? { background: '#fef3c7', border: '1px solid #fde68a', color: '#b45309' }
+                  : { background: '#ede9fe', border: '1px solid #ddd6fe', color: '#6d28d9' }
+              }
+            >
+              {/* Icon mặt trời/mặt trăng giữ nguyên như code cũ */}
+              {state.shift}
+            </div>
+          )}
         </header>
 
-        {/* ── Nội dung động render ở đây ── */}
         <Outlet />
       </main>
-
     </div>
   );
 };

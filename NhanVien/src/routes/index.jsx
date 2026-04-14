@@ -5,8 +5,10 @@ import ServiceDeskPage from '../pages/ServiceDeskPage/ServiceDeskPage';
 import NurseStationPage from '../pages/NurseStationPage/NurseStationPage';
 import MedicalExamPage from '../pages/MedicalExamPage/MedicalExamPage';
 import ExamQueuePage from '../pages/MedicalExamPage/Examqueuepage';
-import SchedulePage from '../pages/MedicalExamPage/Schedulepage';
 import ExamPage from '../pages/MedicalExamPage/Exampage';
+import ScheduleTab from '../pages/MedicalExamPage/ScheduleTab';
+import ScheduleList from '../pages/MedicalExamPage/ScheduleList';
+import CreateSchedule from '../pages/MedicalExamPage/CreateSchedule';
 
 const AppRouter = () => {
   return (
@@ -19,7 +21,9 @@ const AppRouter = () => {
       <Route path="/kham-benh" element={<MedicalExamPage />}>
         <Route index element={<ExamQueuePage />} />
         <Route path="kham" element={<ExamPage />} />
-        <Route path="lich-truc" element={<SchedulePage />} />
+        <Route path="lich-truc" element={<ScheduleTab />} />
+        <Route path="danh-sach-lich" element={<ScheduleList />} />
+        <Route path="tao-lich-truc" element={<CreateSchedule />} />
       </Route>
     </Routes>
   );

@@ -1,3 +1,5 @@
+import React from 'react';
+
 const Icons = {
   Building: () => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -27,6 +29,12 @@ const Icons = {
   Plus: () => (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+    </svg>
+  ),
+  // Bổ sung Icon List cho "Danh sách lịch trực"
+  List: () => (
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+      <path d="M2 4.5h11M2 7.5h11M2 10.5h11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
   ),
   Queue: () => (
@@ -102,8 +110,7 @@ const Icons = {
       <circle cx="4" cy="2" r="1" fill="currentColor"/>
     </svg>
   ),
-
-   Clock: () => (
+  Clock: () => (
     <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
       <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.2"/>
       <path d="M6.5 3.5v3l2 1.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
