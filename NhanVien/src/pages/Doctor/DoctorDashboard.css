@@ -1,0 +1,59 @@
+.doctor-dashboard {
+  padding-bottom: 24px;
+}
+
+/* --- CỘT TRÁI: LIST --- */
+.queue-card .ant-card-head { border-bottom: none; padding: 12px 20px; }
+.queue-list {
+  height: calc(100vh - 250px);
+  overflow-y: auto;
+}
+
+.queue-item {
+  padding: 16px 20px !important;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.queue-item:hover { background-color: #f9fafb; }
+.queue-item.active { background-color: #eff6ff; border-left: 4px solid #2563eb; }
+
+.queue-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #6b7280;
+}
+
+/* --- CỘT PHẢI: BÀN KHÁM --- */
+.empty-state {
+  height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.font-bold { font-weight: 600; }
+.mb-4 { margin-bottom: 16px; }
+.mb-1 { margin-bottom: 4px; }
+.pb-4 { padding-bottom: 16px; }
+.pt-4 { padding-top: 16px; }
+.p-3 { padding: 12px; }
+.border-b { border-bottom: 1px solid #f0f0f0; }
+.border-t { border-top: 1px solid #f0f0f0; }
+.bg-gray-50 { background-color: #f9fafb; }
+.text-xs { font-size: 12px; }
+.text-gray-500 { color: #6b7280; }
+.flex { display: flex; }
+.justify-end { justify-content: flex-end; }
+.gap-3 { gap: 12px; }
+.mt-6 { margin-top: 24px; }
+
+/* Tùy chỉnh Tabs của Antd cho đẹp hơn */
+.consultation-card .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab { border-radius: 8px 8px 0 0; }
+.consultation-card .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active { background: #fff; border-bottom-color: #fff; }
+
+/* Animation */
+.fade-in { animation: fadeIn 0.3s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

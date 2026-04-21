@@ -1,13 +1,16 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'  // ✅ thêm dòng này
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
-import AppRouter from './routes';
+import App from './App.jsx'
+
+// Khởi tạo bộ quản lý dữ liệu của React Query
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>       
-      <AppRouter />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
   </StrictMode>,
 )

@@ -1,0 +1,141 @@
+.staff-dashboard {
+  padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+}
+
+.dashboard-header {
+  background: #ffffff;
+  padding: 20px 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  border: 1px solid #f3f4f6;
+}
+
+/* --- OVERRIDES & SHADOW CARDS --- */
+.shadow-card {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+  border-radius: 16px;
+  border: 1px solid #f3f4f6;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.shadow-card .ant-card-head {
+  border-bottom: 1px solid #f3f4f6;
+  background-color: #ffffff;
+  font-weight: 700;
+  font-size: 16px;
+  color: #111827;
+  padding: 16px 24px;
+}
+
+.shadow-card .ant-card-body {
+  padding: 24px;
+}
+
+/* --- STATISTIC CARDS CONFIGURATION --- */
+.stat-card {
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+}
+
+.stat-card.stat-waiting {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fde68a;
+}
+.stat-card.stat-waiting .ant-statistic-title { color: #d97706; font-weight: 600; font-size: 15px; }
+.stat-card.stat-waiting .ant-statistic-content { color: #b45309; font-weight: 800; font-size: 32px; }
+
+.stat-card.stat-progress {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #bfdbfe;
+}
+.stat-card.stat-progress .ant-statistic-title { color: #2563eb; font-weight: 600; font-size: 15px; }
+.stat-card.stat-progress .ant-statistic-content { color: #1d4ed8; font-weight: 800; font-size: 32px; }
+
+.stat-card.stat-done {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid #bbf7d0;
+}
+.stat-card.stat-done .ant-statistic-title { color: #16a34a; font-weight: 600; font-size: 15px; }
+.stat-card.stat-done .ant-statistic-content { color: #15803d; font-weight: 800; font-size: 32px; }
+
+/* --- LIST & TABLE OVERRIDES --- */
+.ant-table-wrapper .ant-table-thead > tr > th {
+  background-color: #f9fafb !important;
+  color: #4b5563;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 13px;
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ant-table-tbody > tr > td {
+  padding: 16px;
+  vertical-align: middle;
+}
+
+.schedule-item-card {
+  background: #ffffff;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  padding: 16px 20px !important;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.schedule-item-card:hover {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  transform: translateX(4px);
+}
+
+.quick-list-item {
+  border: 1px solid #f3f4f6;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  padding: 8px 16px !important;
+  transition: all 0.2s;
+}
+.quick-list-item:hover {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+/* --- CUSTOM TABS STYLING --- */
+.custom-tabs .ant-tabs-nav { margin-bottom: 24px; }
+.custom-tabs .ant-tabs-tab { padding: 12px 0; font-size: 16px; color: #6b7280; transition: all 0.3s; }
+.custom-tabs .ant-tabs-tab:hover { color: #2563eb; }
+.custom-tabs .ant-tabs-tab-active .ant-tabs-tab-btn { color: #2563eb !important; font-weight: 600; }
+.custom-tabs .ant-tabs-ink-bar { background: #2563eb; height: 3px !important; border-radius: 3px 3px 0 0; }
+
+/* --- FORM STYLING --- */
+.ant-form-item-label > label { font-weight: 500; color: #374151; }
+.ant-input, .ant-select-selector { border-radius: 8px !important; }
+.ant-btn { border-radius: 8px; font-weight: 500; }
+
+/* --- ANIMATIONS --- */
+.fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Tailwind-like utilities left for structural convenience */
+.mb-2 { margin-bottom: 8px; }
+.mb-4 { margin-bottom: 16px; }
+.mt-4 { margin-top: 16px; }
+.block { display: block; }
+.flex { display: flex; }
+.justify-between { justify-content: space-between; }
+.items-end { align-items: flex-end; }
+.items-center { align-items: center; }
+.gap-2 { gap: 8px; }
+.gap-4 { gap: 16px; }
+.text-gray-400 { color: #9ca3af; }

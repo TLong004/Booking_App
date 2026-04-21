@@ -1,0 +1,88 @@
+.head-dept-dashboard {
+  width: 100%;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- HEADER TỔNG --- */
+.head-dept-dashboard .dashboard-header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+/* --- CUSTOM TABS (Hiện đại, bo tròn như nút bấm) --- */
+.custom-large-tabs .ant-tabs-nav {
+  margin-bottom: 24px;
+}
+.custom-large-tabs .ant-tabs-nav-list { 
+  font-weight: 600; 
+  background-color: #f3f4f6;
+  padding: 6px;
+  border-radius: 12px;
+}
+.custom-large-tabs .ant-tabs-tab {
+  padding: 10px 24px !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease;
+  margin: 0 !important;
+  color: #6b7280;
+}
+.custom-large-tabs .ant-tabs-tab:hover {
+  color: #374151;
+}
+.custom-large-tabs .ant-tabs-tab-active {
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.custom-large-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #2563eb !important;
+}
+.custom-large-tabs .ant-tabs-ink-bar {
+  display: none; /* Ẩn thanh gạch dưới mặc định của Antd */
+}
+
+/* --- CUSTOM CARDS (Đổ bóng mềm, bo góc) --- */
+.head-dept-dashboard .ant-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f3f4f6;
+  transition: all 0.3s ease;
+}
+.head-dept-dashboard .ant-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+.head-dept-dashboard .ant-card-head {
+  border-bottom: 1px solid #f3f4f6;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* --- CUSTOM CALENDAR EVENTS --- */
+.events {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.events li {
+  margin-bottom: 4px;
+}
+.events .ant-badge-status {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  padding: 4px 8px;
+  background-color: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+.events .ant-badge-status-success { background-color: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+.events .ant-badge-status-warning { background-color: #fffbeb; border-color: #fef3c7; color: #b45309; }
+.events .ant-badge-status-error { background-color: #fef2f2; border-color: #fecaca; color: #991b1b; }
