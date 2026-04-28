@@ -1,23 +1,42 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 
-// Import các trang thật
+// Import Layout và Auth (giữ tải đồng bộ vì dùng ngay lúc đầu)
 import LoginPage from '../pages/LoginPage';
 import MainLayout from '../MainLayout';
-
-// Import các trang của Admin
-import StaffDashboard from '../pages/staff/StaffDashboard'; // Trang Lễ tân & Thu ngân
-import AdminDashboard from '../pages/admin/AdminDashboard'; // Trang thống kê
-import DoctorManagementPage from '../pages/admin/DoctorManagementPage'; // Trang quản lý bác sĩ
-import UserManagementPage from '../pages/admin/UserManagementPage'; // Trang quản lý người dùng
-import SpecialtyManagementPage from '../pages/admin/SpecialtyManagementPage'; // Trang quản lý chuyên khoa
-import ServiceManagementPage from '../pages/admin/ServiceManagementPage'; // Trang quản lý dịch vụ
-import MedicineManagementPage from '../pages/admin/MedicineManagementPage'; // Trang quản lý thuốc
-import DoctorDashboard from '../pages/doctor/DoctorDashboard'; // Trang Bác sĩ
-import HeadDeptDashboard from '../pages/headdept/HeadDeptDashboard'; // Trang Trưởng khoa
+import ErrorBoundary from '../components/ErrorBoundary';
+import NotFoundPage from '../pages/NotFoundPage';
 
 const UnauthorizedPage = () => <div><h1>403 - Bạn không có quyền truy cập trang này</h1></div>;
+
+// Component Loading hiển thị trong lúc chờ tải Chunk code
+const PageLoader = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '60vh', color: '#64748b' }}>
+    Đang tải trang...
+  </div>
+);
+
+// HOC Loadable: Bọc ErrorBoundary và Suspense cho TỪNG Component
+const Loadable = (Component) => (props) => (
+  <ErrorBoundary>
+    <Suspense fallback={<PageLoader />}>
+      <Component {...props} />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+// Lazy load các trang chức năng (Code Splitting)
+const StaffDashboard = Loadable(React.lazy(() => import('../pages/staff/StaffDashboard')));
+const AdminDashboard = Loadable(React.lazy(() => import('../pages/admin/AdminDashboard')));
+const DoctorManagementPage = Loadable(React.lazy(() => import('../pages/admin/DoctorManagementPage')));
+const UserManagementPage = Loadable(React.lazy(() => import('../pages/admin/UserManagementPage')));
+const SpecialtyManagementPage = Loadable(React.lazy(() => import('../pages/admin/SpecialtyManagementPage')));
+const ServiceManagementPage = Loadable(React.lazy(() => import('../pages/admin/ServiceManagementPage')));
+const MedicineManagementPage = Loadable(React.lazy(() => import('../pages/admin/MedicineManagementPage')));
+const DoctorDashboard = Loadable(React.lazy(() => import('../pages/doctor/DoctorDashboard')));
+const DoctorSchedule = Loadable(React.lazy(() => import('../pages/doctor/DoctorSchedule')));
+const HeadDeptDashboard = Loadable(React.lazy(() => import('../pages/headdept/HeadDeptDashboard')));
 
 // Định nghĩa các Quyền (Roles) khớp chuẩn với Database của bạn
 const ROLES = {
@@ -45,7 +64,8 @@ const AppRoutes = () => {
           {/* PROTECTED ROUTES - Dành cho Bác Sĩ & Trưởng Khoa */}
           {/* Trưởng khoa cũng là bác sĩ nên được phép truy cập trang khám bệnh */}
           <Route element={<ProtectedRoute allowedRoles={[ROLES.DOCTOR, ROLES.HEAD_DEPT]} />}>
-            <Route path="/doctor/*" element={<DoctorDashboard />} />
+            <Route path="/doctor" element={<DoctorDashboard />} />
+            <Route path="/doctor/schedule" element={<DoctorSchedule />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={[ROLES.HEAD_DEPT]} />}>
@@ -61,12 +81,15 @@ const AppRoutes = () => {
             <Route path="/admin/services" element={<ServiceManagementPage />} />
             <Route path="/admin/medicines" element={<MedicineManagementPage />} />
             {/* Redirect từ /admin về /admin/dashboard */}
-            <Route path="/admin" index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
           </Route>
+
+          {/* 404 NOT FOUND: Nếu người dùng gõ sai URL NHƯNG đang đăng nhập -> Hiển thị 404 TRONG MainLayout */}
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
 
-        {/* Nếu gõ sai đường dẫn, tự động văng về trang login */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* 404 NOT FOUND: Bắt các trường hợp lỗi URL ngoài vùng Layout (VD gõ bừa ở màn hình login) */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -2,91 +2,134 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import axiosClient from '../api/axiosClient';
+import { Form, Input, Button, Alert } from 'antd';
+import { UserOutlined, LockOutlined, MedicineBoxOutlined } from '@ant-design/icons';
 import './LoginPage.css';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
+  const roleToPathMap = {
+    'ROLE_ADMIN': '/admin',
+    'ROLE_HEAD_DEPT': '/head-dept',
+    'ROLE_DOCTOR': '/doctor',
+    'ROLE_STAFF': '/staff',
+  };
 
-    // --- BẮT ĐẦU: CODE GIẢ LẬP TEST GIAO DIỆN (Xóa phần này khi đã có API Backend) ---
+  const handleLogin = async (values) => {
+    const { username, password } = values;
+    setError('');
+    setLoading(true);
+
+    // --- GIẢ LẬP TEST (Xóa khi có API) ---
     if (password === '123') {
       let mockUser = null;
-      if (username === 'admin') mockUser = { id: 1, username: 'Admin', roles: ['ROLE_ADMIN'] };
+      if (username === 'admin')  mockUser = { id: 1, username: 'Admin', roles: ['ROLE_ADMIN'] };
       else if (username === 'doctor') mockUser = { id: 2, username: 'Bác sĩ', roles: ['ROLE_DOCTOR'] };
-      else if (username === 'head') mockUser = { id: 3, username: 'Trưởng Khoa', roles: ['ROLE_HEAD_DEPT'] };
-      else if (username === 'staff') mockUser = { id: 4, username: 'Lễ Tân', roles: ['ROLE_STAFF'] };
+      else if (username === 'head')   mockUser = { id: 3, username: 'Trưởng Khoa', roles: ['ROLE_HEAD_DEPT'] };
+      else if (username === 'staff')  mockUser = { id: 4, username: 'Lễ Tân', roles: ['ROLE_STAFF'] };
 
       if (mockUser) {
         login(mockUser, 'mock-token-' + username);
-        const firstRole = mockUser.roles[0];
-        if (firstRole === 'ROLE_ADMIN') navigate('/admin');
-        else if (firstRole === 'ROLE_HEAD_DEPT') navigate('/head-dept');
-        else if (firstRole === 'ROLE_DOCTOR') navigate('/doctor');
-        else if (firstRole === 'ROLE_STAFF') navigate('/staff');
+        navigate(roleToPathMap[mockUser.roles[0]] || '/login');
         return;
       } else {
-        setError('Tài khoản test không đúng (chỉ dùng: admin, doctor, head, staff)');
+        setError('Tài khoản test không hợp lệ (dùng: admin, doctor, head, staff)');
+        setLoading(false);
         return;
       }
     }
-    // --- KẾT THÚC: CODE GIẢ LẬP ---
+    // --- KẾT THÚC GIẢ LẬP ---
 
     try {
-      // TODO: Thay thế '/auth/login' bằng endpoint đăng nhập thật của bạn
       const response = await axiosClient.post('/auth/login', { username, password });
-      
-      // Giả sử API trả về: { token: '...', user: { id, username, roles: ['ROLE_...'] } }
       const { token, user } = response.data;
-
-      // 1. Lưu token và thông tin user vào store
       login(user, token);
-
-      // 2. Điều hướng tới trang phù hợp với quyền cao nhất của user
-      const firstRole = user.roles[0];
-      if (firstRole === 'ROLE_ADMIN') navigate('/admin');
-      else if (firstRole === 'ROLE_HEAD_DEPT') navigate('/head-dept');
-      else if (firstRole === 'ROLE_DOCTOR') navigate('/doctor');
-      else if (firstRole === 'ROLE_STAFF') navigate('/staff');
-      else navigate('/login'); // Nếu không có quyền phù hợp, ở lại trang login
-
+      navigate(roleToPathMap[user.roles[0]] || '/login');
     } catch (err) {
       setError('Tên đăng nhập hoặc mật khẩu không đúng!');
       console.error('Login failed:', err);
+      setLoading(false);
     }
   };
 
   return (
     <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <div className="login-logo">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
+
+      {/* ── Left Panel ── */}
+      <div className="login-left">
+        <div className="login-logo">
+          <div className="login-logo-icon">
+            <MedicineBoxOutlined />
           </div>
-          <h2>Phòng Khám Đa Khoa</h2>
-          <p>Đăng nhập để tiếp tục</p>
+          <div>
+            <p className="login-logo-name">Phòng Khám Đa Khoa</p>
+            <p className="login-logo-sub">Hệ thống quản lý y tế</p>
+          </div>
         </div>
-        <form onSubmit={handleLogin} className="login-form">
-          <div className="input-group">
-            <label>Tên đăng nhập</label>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="Nhập tên đăng nhập" />
-          </div>
-          <div className="input-group">
-            <label>Mật khẩu</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Nhập mật khẩu" />
-          </div>
-          {error && <div className="error-message">{error}</div>}
-          <button type="submit" className="login-button">Đăng nhập</button>
-        </form>
+
+        <div className="login-headline">
+          <h2>
+            Chào mừng
+            <span>quay trở lại.</span>
+          </h2>
+          <p>
+            Nền tảng hỗ trợ đội ngũ y bác sĩ quản lý
+            bệnh nhân và lịch khám một cách chuyên nghiệp.
+          </p>
+        </div>
+
+        <div className="login-status">
+          <div className="login-status-dot" />
+          <span>Hệ thống đang hoạt động</span>
+        </div>
       </div>
+
+      {/* ── Right Panel ── */}
+      <div className="login-right">
+        <p className="login-form-title">Đăng nhập</p>
+        <p className="login-form-sub">Vui lòng nhập thông tin tài khoản</p>
+
+        <Form name="login" onFinish={handleLogin} autoComplete="off" size="large" layout="vertical">
+          <Form.Item
+            name="username"
+            label="Tên đăng nhập"
+            rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
+          >
+            <Input prefix={<UserOutlined />} placeholder="Nhập tên đăng nhập" />
+          </Form.Item>
+
+          <Form.Item
+            name="password"
+            label="Mật khẩu"
+            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+          >
+            <Input.Password prefix={<LockOutlined />} placeholder="••••••••" />
+          </Form.Item>
+
+          {error && (
+            <Alert message={error} type="error" showIcon style={{ marginBottom: 20 }} />
+          )}
+
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="login-button"
+              block
+              loading={loading}
+            >
+              Đăng nhập
+            </Button>
+          </Form.Item>
+        </Form>
+
+        <p className="login-hint">Liên hệ quản trị viên nếu quên mật khẩu</p>
+      </div>
+
     </div>
   );
 };

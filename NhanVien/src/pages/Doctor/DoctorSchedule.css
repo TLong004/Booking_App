@@ -1,0 +1,234 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+.ds-container {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #0f172a;
+  padding: 16px 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+/* Header */
+.ds-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ds-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.ds-subtitle {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #64748b;
+}
+.ds-stats {
+  display: flex;
+  gap: 8px;
+}
+.ds-stat-card {
+  border-radius: 10px;
+  padding: 6px 14px;
+  text-align: center;
+}
+.ds-stat-val {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+.ds-stat-lbl {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+/* Body Layout */
+.ds-body {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Calendar Area */
+.ds-calendar {
+  flex: 1;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.ds-cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+.ds-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: background 0.15s;
+}
+.ds-nav-btn:hover { background: #f8fafc; }
+.ds-nav-month { display: flex; align-items: center; gap: 12px; }
+.ds-nav-month span { font-size: 15px; font-weight: 700; }
+.ds-nav-today {
+  background: #eff6ff;
+  color: #2563eb;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ds-nav-today:hover { background: #dbeafe; }
+
+.ds-cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 8px 12px 4px;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.ds-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.3px;
+  padding: 2px 0;
+}
+.ds-weekday.sunday { color: #ef4444; }
+
+.ds-cal-grid-wrap { flex: 1; overflow-y: auto; padding: 4px 12px 12px; }
+.ds-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+
+/* Day Cells */
+.ds-day-empty { min-height: 88px; border-radius: 10px; background: #fafafa; }
+.ds-day-cell {
+  min-height: 88px;
+  padding: 8px 10px;
+  border: 1.5px solid #f1f5f9;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.ds-day-cell:hover { background: #f8fafc; border-color: #cbd5e1; }
+.ds-day-cell.today { border-color: #93c5fd; background: #f8fbff; }
+.ds-day-cell.selected {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+}
+.ds-day-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.ds-day-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 500;
+  color: #0f172a;
+}
+.ds-day-num.weekend { color: #ef4444; }
+.ds-day-num.today { background: #2563eb; color: #fff; font-weight: 700; }
+
+/* Badges */
+.ds-badges-compact { display: flex; gap: 3px; }
+.ds-badges-list { display: flex; flex-direction: column; gap: 3px; }
+.ds-badge-compact { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ds-badge-full { display: flex; align-items: center; gap: 6px; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.ds-badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.ds-badge-time { font-weight: 400; opacity: 0.75; font-size: 10px; }
+
+/* Side Panel & Detail */
+.ds-side-panel { width: 240px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
+
+.ds-detail-empty {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  padding: 24px 20px;
+  text-align: center;
+  color: #94a3b8;
+}
+.ds-detail-empty-icon { font-size: 32px; margin-bottom: 8px; }
+.ds-detail-empty-title { font-size: 13px; font-weight: 600; color: #334155; }
+.ds-detail-empty-sub { font-size: 12px; margin-top: 4px; }
+
+.ds-detail-panel {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 32px rgba(15,23,42,0.12);
+  overflow: hidden;
+  animation: dsFadeIn 0.18s ease-out;
+}
+@keyframes dsFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ds-detail-header { padding: 16px 20px; background: #0f172a; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+.ds-detail-weekday { font-size: 18px; font-weight: 700; }
+.ds-detail-date { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+.ds-detail-close {
+  width: 30px; height: 30px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1);
+  color: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.ds-detail-close:hover { background: rgba(255,255,255,0.2); }
+
+.ds-detail-body { padding: 16px 20px; }
+.ds-detail-no-shift { text-align: center; padding: 20px 0; color: #94a3b8; }
+.ds-detail-no-shift-icon { font-size: 28px; margin-bottom: 6px; }
+.ds-detail-no-shift-title { font-size: 13px; font-weight: 500; color: #334155; }
+.ds-detail-no-shift-sub { font-size: 12px; margin-top: 4px; }
+
+.ds-shift-list { display: flex; flex-direction: column; gap: 10px; }
+.ds-shift-card { border-radius: 10px; padding: 12px 14px; }
+.ds-shift-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.ds-shift-card-icon { font-size: 18px; }
+.ds-shift-card-title { font-weight: 700; font-size: 13px; }
+.ds-shift-card-info { display: flex; flex-direction: column; gap: 4px; }
+.ds-shift-card-row { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+
+/* Legend */
+.ds-legend { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 14px 16px; }
+.ds-legend-title {
+  font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 10px;
+}
+.ds-legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ds-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ds-legend-lbl { font-size: 12px; color: #334155; font-weight: 500; }
+.ds-legend-today {
+  width: 22px; height: 22px; border-radius: 50%; background: #2563eb;
+  display: flex; align-items: center; justify-content: center; font-size: 9px;
+  color: #fff; font-weight: 700; flex-shrink: 0;
+}

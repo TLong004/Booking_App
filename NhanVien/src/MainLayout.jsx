@@ -52,8 +52,19 @@ const MainLayout = () => {
         </div>
         <nav className="sidebar-nav">
           {role === 'ROLE_ADMIN' && renderAdminMenu()}
-          {role === 'ROLE_DOCTOR' && <NavLink to="/doctor">{ICONS.doctors} Lịch khám</NavLink>}
-          {role === 'ROLE_HEAD_DEPT' && <NavLink to="/head-dept">{ICONS.dashboard} Quản lý Khoa</NavLink>}
+          {(role === 'ROLE_DOCTOR' || role === 'ROLE_HEAD_DEPT') && (
+            <>
+              {role === 'ROLE_HEAD_DEPT' && <p className="sidebar-menu-title">Công việc Bác sĩ</p>}
+              <NavLink to="/doctor" end>{ICONS.doctors} Khám bệnh</NavLink>
+              <NavLink to="/doctor/schedule">{ICONS.dashboard} Lịch trực</NavLink>
+            </>
+          )}
+          {role === 'ROLE_HEAD_DEPT' && (
+            <>
+              <p className="sidebar-menu-title">Quản lý Khoa</p>
+              <NavLink to="/head-dept">{ICONS.specialties} Tổng quan Khoa</NavLink>
+            </>
+          )}
           {role === 'ROLE_STAFF' && <NavLink to="/staff">{ICONS.users} Lễ tân & Thu ngân</NavLink>}
         </nav>
       </aside>
