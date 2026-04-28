@@ -54,6 +54,9 @@ const AppRoutes = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
+        {/* Route mặc định, chuyển hướng đến trang login khi truy cập vào trang gốc */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
         {/* CÁC TRANG CÓ CHUNG LAYOUT (Sidebar + Header) */}
         <Route element={<MainLayout />}>
           {/* PROTECTED ROUTES - Dành cho Lễ Tân */}

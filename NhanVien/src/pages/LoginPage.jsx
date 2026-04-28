@@ -24,33 +24,44 @@ const LoginPage = () => {
     setError('');
     setLoading(true);
 
-    // --- GIẢ LẬP TEST (Xóa khi có API) ---
-    if (password === '123') {
-      let mockUser = null;
-      if (username === 'admin')  mockUser = { id: 1, username: 'Admin', roles: ['ROLE_ADMIN'] };
-      else if (username === 'doctor') mockUser = { id: 2, username: 'Bác sĩ', roles: ['ROLE_DOCTOR'] };
-      else if (username === 'head')   mockUser = { id: 3, username: 'Trưởng Khoa', roles: ['ROLE_HEAD_DEPT'] };
-      else if (username === 'staff')  mockUser = { id: 4, username: 'Lễ Tân', roles: ['ROLE_STAFF'] };
-
-      if (mockUser) {
-        login(mockUser, 'mock-token-' + username);
-        navigate(roleToPathMap[mockUser.roles[0]] || '/login');
-        return;
-      } else {
-        setError('Tài khoản test không hợp lệ (dùng: admin, doctor, head, staff)');
-        setLoading(false);
-        return;
-      }
-    }
-    // --- KẾT THÚC GIẢ LẬP ---
-
     try {
+      // Gọi API thực tế xuống Backend (Spring Boot)
       const response = await axiosClient.post('/auth/login', { username, password });
-      const { token, user } = response.data;
+      
+      // Lấy dữ liệu từ response (Tùy cấu trúc BE trả về flat object hoặc có bọc trong 'user')
+      const data = response.data;
+      const token = data.token || data.accessToken || data.jwt; // BE trả về jwt
+      
+      const user = data.user || {
+        id: data.id,
+        username: data.username,
+        roles: data.roles,
+        fullName: data.fullName, // Lấy thêm fullName để hiển thị trên Header
+      };
+
+      // Chuẩn hóa roles nếu BE trả về dạng mảng object (VD: [{ authority: 'ROLE_ADMIN' }])
+      if (user.roles && user.roles.length > 0 && typeof user.roles[0] === 'object') {
+        user.roles = user.roles.map(r => r.authority || r.name || r.roleName);
+      }
+
       login(user, token);
-      navigate(roleToPathMap[user.roles[0]] || '/login');
+      
+      // Lấy role đầu tiên để điều hướng
+      const primaryRole = user.roles ? user.roles[0] : '';
+      navigate(roleToPathMap[primaryRole] || '/unauthorized');
     } catch (err) {
-      setError('Tên đăng nhập hoặc mật khẩu không đúng!');
+      // Đảm bảo error luôn là string để tránh lỗi văng màn hình React
+      let errorMessage = 'Tên đăng nhập hoặc mật khẩu không đúng!';
+      if (err.response?.data) {
+        if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data; // BE trả về chuỗi trực tiếp
+        } else if (err.response.data.message) {
+          errorMessage = err.response.data.message; // BE trả về object có chứa message
+        } else if (err.response.data.error) {
+          errorMessage = err.response.data.error; // BE trả về object lỗi mặc định (vd: Internal Server Error)
+        }
+      }
+      setError(errorMessage);
       console.error('Login failed:', err);
       setLoading(false);
     }
@@ -111,7 +122,7 @@ const LoginPage = () => {
           </Form.Item>
 
           {error && (
-            <Alert message={error} type="error" showIcon style={{ marginBottom: 20 }} />
+            <Alert title={error} type="error" showIcon style={{ marginBottom: 20 }} />
           )}
 
           <Form.Item style={{ marginBottom: 0 }}>

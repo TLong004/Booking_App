@@ -1,96 +1,106 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { specialtyApi } from '../../api/specialtyApi';
-import DataTable from './DataTable';
-import Modal from './Modal';
+import React, { useState, useEffect } from 'react';
+import { adminApi } from '../../api/adminApi';
+import { Table, Button, Modal, Form, Input, message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import './DoctorManagementPage.css';
 
 const SpecialtyManagementPage = () => {
-  const queryClient = useQueryClient();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({ name: '', description: '' });
+  const [specialties, setSpecialties] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
 
-  const { data: response, isLoading, error } = useQuery({
-    queryKey: ['specialties'],
-    queryFn: specialtyApi.getAll,
-  });
-  const specialties = response?.data;
+  const fetchSpecialties = async () => {
+    setLoading(true);
+    try {
+      const data = await adminApi.getAllSpecialties();
+      setSpecialties(data);
+    } catch (error) {
+      message.error('Lỗi khi tải danh sách chuyên khoa!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSpecialties();
+  }, []);
+
+  const handleAddSpecialty = async (values) => {
+    try {
+      await adminApi.createSpecialty(values);
+      message.success('Thêm chuyên khoa thành công!');
+      setIsModalVisible(false);
+      form.resetFields();
+      fetchSpecialties();
+    } catch (error) {
+      message.error('Có lỗi xảy ra khi thêm chuyên khoa!');
+    }
+  };
 
   const columns = [
-    { header: 'Tên chuyên khoa', accessor: 'name', cell: (row) => <strong>{row.name}</strong> },
-    { header: 'Mô tả', accessor: 'description' },
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      width: '10%',
+    },
+    {
+      title: 'Tên chuyên khoa',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Mô tả',
+      dataIndex: 'description',
+      key: 'description',
+    },
   ];
-
-  const openAddModal = () => {
-    setFormData({ name: '', description: '' });
-    setEditingId(null);
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = (spec) => {
-    setFormData({ name: spec.name, description: spec.description || '' });
-    setEditingId(spec.id);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => setIsModalOpen(false);
-
-  const createMutation = useMutation({
-    mutationFn: specialtyApi.create,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['specialties'] }); closeModal(); }
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => specialtyApi.update(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['specialties'] }); closeModal(); }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: specialtyApi.delete,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['specialties'] })
-  });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (editingId) updateMutation.mutate({ id: editingId, data: formData });
-    else createMutation.mutate(formData);
-  };
-
-  const handleDelete = (spec) => {
-    if (window.confirm(`Bạn có chắc chắn muốn xóa chuyên khoa ${spec.name}?`))
-      deleteMutation.mutate(spec.id);
-  };
-
-  const renderActions = (spec) => (
-    <>
-      <button className="action-btn edit-btn" onClick={() => openEditModal(spec)}>Sửa</button>
-      <button className="action-btn delete-btn" onClick={() => handleDelete(spec)}>Xóa</button>
-    </>
-  );
-
-  const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="admin-dashboard">
-      <header className="dashboard-header">
-        <h1>Quản lý Chuyên khoa</h1>
-        <button className="add-new-btn" onClick={openAddModal}>+ Thêm chuyên khoa</button>
-      </header>
-      {isLoading && <p>Đang tải dữ liệu...</p>}
-      {error && <p className="error-message">Có lỗi xảy ra: {error.message}</p>}
-      {specialties && <DataTable columns={columns} data={specialties} renderActions={renderActions} />}
-      <Modal isOpen={isModalOpen} onClose={closeModal} title={editingId ? 'Sửa chuyên khoa' : 'Thêm chuyên khoa mới'}>
-        <form onSubmit={handleSubmit} className="admin-form">
-          <div className="form-group"><label>Tên chuyên khoa</label><input type="text" name="name" value={formData.name} onChange={handleInputChange} required placeholder="VD: Khoa Nội, Khoa Ngoại..." /></div>
-          <div className="form-group"><label>Mô tả</label><textarea name="description" value={formData.description} onChange={handleInputChange} rows={4} placeholder="Mô tả chức năng chuyên khoa..." /></div>
-          <div className="form-actions"><button type="button" className="btn-cancel" onClick={closeModal}>Hủy</button><button type="submit" className="btn-submit" disabled={isSubmitting}>{isSubmitting ? 'Đang lưu...' : 'Lưu thông tin'}</button></div>
-        </form>
+      <div className="dashboard-header">
+        <h1>Quản lý chuyên khoa</h1>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          onClick={() => setIsModalVisible(true)}
+          className="add-new-btn"
+        >
+          Thêm chuyên khoa
+        </Button>
+      </div>
+
+      <div className="table-container">
+        <Table 
+          dataSource={specialties} 
+          columns={columns} 
+          rowKey="id" 
+          loading={loading}
+          className="data-table"
+          pagination={{ pageSize: 10 }}
+        />
+      </div>
+
+      <Modal
+        title="Thêm chuyên khoa mới"
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+        className="modal-box"
+      >
+        <Form form={form} layout="vertical" onFinish={handleAddSpecialty} className="admin-form">
+          <Form.Item name="name" label="Tên chuyên khoa" rules={[{ required: true, message: 'Vui lòng nhập tên chuyên khoa!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="description" label="Mô tả">
+            <Input.TextArea rows={4} />
+          </Form.Item>
+          <div className="form-actions">
+            <Button className="btn-cancel" onClick={() => setIsModalVisible(false)}>Hủy</Button>
+            <Button type="primary" htmlType="submit" className="btn-submit">Lưu</Button>
+          </div>
+        </Form>
       </Modal>
     </div>
   );
