@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+# Firebase secret keys
+serviceAccountKey.json
+google-services.json
+*.p12
+*.jks

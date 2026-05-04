@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+# Firebase secret keys
+serviceAccountKey.json
+google-services.json
+*.p12
+*.jks

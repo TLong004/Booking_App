@@ -1,190 +1,287 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '../../api/adminApi';
-import axiosClient from '../../api/axiosClient';
-import { Table, Button, Modal, Form, Input, Select, message, Tag } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import './DoctorManagementPage.css'; // Sử dụng chung style của trang admin
+import DataTable from './DataTable';
+import Modal from './Modal';
+import './AdminDashboard.css';
+
+const ROLES = [
+  { value: 'ROLE_ADMIN',     label: 'Admin',       badgeClass: 'badge badge-red'    },
+  { value: 'ROLE_HEAD_DEPT', label: 'Head Dept',   badgeClass: 'badge badge-purple' },
+  { value: 'ROLE_DOCTOR',    label: 'Doctor',      badgeClass: 'badge badge-blue'   },
+  { value: 'ROLE_STAFF',     label: 'Staff',       badgeClass: 'badge badge-orange' },
+];
+
+const DEGREES = ['Bác sĩ', 'Thạc sĩ', 'Tiến sĩ', 'Phó giáo sư', 'Giáo sư'];
+
+const ROLE_MAP = Object.fromEntries(ROLES.map(r => [r.value, r]));
+
+const DOCTOR_ROLES = ['ROLE_DOCTOR', 'ROLE_HEAD_DEPT'];
+
+const EMPTY_FORM = {
+  username: '', password: '', email: '', phone: '', fullName: '',
+  roleName: '', isActive: true,
+  // Doctor-specific
+  specialtyId: '', degree: 'Bác sĩ', roomNumber: '', consultationFee: '', bio: '',
+};
 
 const UserManagementPage = () => {
-  const [users, setUsers] = useState([]);
-  const [specialties, setSpecialties] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('');
-  const [form] = Form.useForm();
+  const queryClient = useQueryClient();
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const data = await adminApi.getAllUsers();
-      setUsers(data);
-    } catch (error) {
-      message.error('Lỗi khi tải danh sách người dùng!');
-    } finally {
-      setLoading(false);
-    }
+  // Filters
+  const [search, setSearch]     = useState('');
+  const [filterRole, setRole]   = useState('');
+  const [filterStatus, setStatus] = useState('');
+
+  // Modal
+  const [isOpen, setIsOpen]       = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm]           = useState(EMPTY_FORM);
+
+  // Data
+  const { data: usersRes, isLoading, error } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: adminApi.getAllUsers,
+  });
+  const { data: specialtiesRes } = useQuery({
+    queryKey: ['specialties'],
+    queryFn: adminApi.getAllSpecialties,
+  });
+
+  const users      = usersRes?.data ?? [];
+  const specialties = specialtiesRes?.data ?? [];
+
+  // Filtered list
+  const filtered = useMemo(() => {
+    return users.filter(u => {
+      const roleStr = u.roles?.[0]?.roleName ?? '';
+      const matchSearch = !search ||
+        u.username?.toLowerCase().includes(search.toLowerCase()) ||
+        u.email?.toLowerCase().includes(search.toLowerCase());
+      const matchRole   = !filterRole   || roleStr === filterRole;
+      const matchStatus = !filterStatus ||
+        (filterStatus === 'active' ? u.isActive : !u.isActive);
+      return matchSearch && matchRole && matchStatus;
+    });
+  }, [users, search, filterRole, filterStatus]);
+
+  // Mutations
+  const createMutation = useMutation({
+    mutationFn: adminApi.createUser,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-users'] }); closeModal(); },
+  });
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => adminApi.updateUser(id, data),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-users'] }); closeModal(); },
+  });
+  const deleteMutation = useMutation({
+    mutationFn: adminApi.deleteUser,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-users'] }),
+  });
+
+  const openAdd = () => {
+    setForm(EMPTY_FORM);
+    setEditingId(null);
+    setIsOpen(true);
   };
 
-  const fetchSpecialties = async () => {
-    try {
-      const response = await axiosClient.get('/admin/specialties');
-      setSpecialties(response.data || []);
-    } catch (error) {
-      message.error('Lỗi khi tải danh sách chuyên khoa!');
-    }
+  const openEdit = (user) => {
+    setForm({
+      username:        user.username,
+      password:        '',
+      email:           user.email ?? '',
+      phone:           user.phone ?? '',
+      fullName:        user.fullName ?? '',
+      roleName:        user.roles?.[0]?.roleName ?? '',
+      isActive:        user.isActive ?? true,
+      specialtyId:     user.doctor?.specialtyId ?? '',
+      degree:          user.doctor?.degree ?? 'Bác sĩ',
+      roomNumber:      user.doctor?.roomNumber ?? '',
+      consultationFee: user.doctor?.consultationFee ?? '',
+      bio:             user.doctor?.bio ?? '',
+    });
+    setEditingId(user.id);
+    setIsOpen(true);
   };
 
-  useEffect(() => {
-    fetchUsers();
-    fetchSpecialties();
-  }, []);
+  const closeModal = () => { setIsOpen(false); setEditingId(null); };
 
-  const handleAddUser = async (values) => {
-    try {
-      await adminApi.createUser(values);
-      message.success('Tạo người dùng thành công!');
-      setIsModalVisible(false);
-      form.resetFields();
-      setSelectedRole(''); // Reset role đã chọn
-      fetchUsers(); // Tải lại danh sách sau khi thêm mới
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi tạo người dùng!';
-      message.error(errorMessage);
-    }
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const payload = { ...form };
+    if (!payload.password && editingId) delete payload.password; // don't send empty pw on edit
+    if (editingId) updateMutation.mutate({ id: editingId, data: payload });
+    else createMutation.mutate(payload);
+  };
+
+  const handleDelete = (user) => {
+    if (window.confirm(`Xóa tài khoản "${user.username}"?`))
+      deleteMutation.mutate(user.id);
+  };
+
+  const isDoctor = DOCTOR_ROLES.includes(form.roleName);
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
   const columns = [
+    { header: 'Tên đăng nhập', accessor: 'username', width: '18%', cell: r => <strong>{r.username}</strong> },
+    { header: 'Email',         accessor: 'email',    width: '24%' },
+    { header: 'Điện thoại',    accessor: 'phone',    width: '16%' },
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      header: 'Vai trò', accessor: 'roles', width: '16%',
+      cell: r => {
+        const roleName = r.roles?.[0]?.roleName ?? '';
+        const meta = ROLE_MAP[roleName];
+        return meta
+          ? <span className={meta.badgeClass}>{meta.label}</span>
+          : <span className="badge badge-gray">{roleName}</span>;
+      },
     },
     {
-      title: 'Tên đăng nhập',
-      dataIndex: 'username',
-      key: 'username',
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Số điện thoại',
-      dataIndex: 'phone',
-      key: 'phone',
-    },
-    {
-      title: 'Vai trò',
-      key: 'roles',
-      dataIndex: 'roles',
-      render: (roles) => (
-        <>
-          {roles?.map(role => {
-            let color = 'blue';
-            if (role.roleName === 'ROLE_ADMIN') color = 'red';
-            else if (role.roleName === 'ROLE_DOCTOR') color = 'green';
-            else if (role.roleName === 'ROLE_HEAD_DEPT') color = 'geekblue';
-            else if (role.roleName === 'ROLE_STAFF') color = 'orange';
-            return (
-              <Tag color={color} key={role.id}>
-                {role.roleName.replace('ROLE_', '')}
-              </Tag>
-            );
-          })}
-        </>
+      header: 'Trạng thái', accessor: 'isActive', width: '12%',
+      cell: r => (
+        <span className={`badge ${r.isActive ? 'badge-green' : 'badge-red'}`}>
+          {r.isActive ? 'Hoạt động' : 'Vô hiệu'}
+        </span>
       ),
     },
   ];
 
   return (
-    <div className="admin-dashboard">
-      <div className="dashboard-header">
+    <div className="admin-page">
+      <div className="page-header">
         <h1>Quản lý người dùng</h1>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            setIsModalVisible(true);
-          }}
-          className="add-new-btn"
-        >
-          Thêm người dùng
-        </Button>
+        <button className="add-btn" onClick={openAdd}>+ Thêm người dùng</button>
       </div>
 
-      <div className="table-container">
-        <Table
-          dataSource={users}
-          columns={columns}
-          rowKey="id"
-          loading={loading}
-          className="data-table"
-          pagination={{ pageSize: 10 }}
+      {/* Filter bar */}
+      <div className="filter-bar">
+        <input
+          type="text"
+          placeholder="Tìm theo tên, email..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
         />
+        <select value={filterRole} onChange={e => setRole(e.target.value)}>
+          <option value="">Tất cả vai trò</option>
+          {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+        </select>
+        <select value={filterStatus} onChange={e => setStatus(e.target.value)}>
+          <option value="">Tất cả trạng thái</option>
+          <option value="active">Hoạt động</option>
+          <option value="inactive">Vô hiệu</option>
+        </select>
+        <span className="count-label">{filtered.length} kết quả</span>
       </div>
+
+      {isLoading && <p style={{ color: '#6b7280', fontSize: 13 }}>Đang tải...</p>}
+      {error && <p className="error-message">Lỗi: {error.message}</p>}
+
+      <DataTable
+        columns={columns}
+        data={filtered}
+        renderActions={user => (
+          <>
+            <button className="action-btn edit-btn"   onClick={() => openEdit(user)}>Sửa</button>
+            <button className="action-btn delete-btn" onClick={() => handleDelete(user)}>Xóa</button>
+          </>
+        )}
+      />
 
       <Modal
-        title="Thêm người dùng mới"
-        open={isModalVisible}
-        onCancel={() => {
-          setIsModalVisible(false);
-          form.resetFields();
-          setSelectedRole('');
-        }}
-        footer={null}
-        className="modal-box"
+        isOpen={isOpen}
+        onClose={closeModal}
+        title={editingId ? 'Sửa thông tin người dùng' : 'Thêm người dùng mới'}
       >
-        <Form form={form} layout="vertical" onFinish={handleAddUser} className="admin-form">
-          <Form.Item name="username" label="Tên đăng nhập" rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="password" label="Mật khẩu" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}>
-            <Input.Password />
-          </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Vui lòng nhập email!' }, { type: 'email', message: 'Email không hợp lệ!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="phone" label="Số điện thoại">
-            <Input />
-          </Form.Item>
-          <Form.Item name="fullName" label="Họ và tên" rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="roleName" label="Vai trò" rules={[{ required: true, message: 'Vui lòng chọn vai trò!' }]}>
-            <Select onChange={(value) => setSelectedRole(value)} placeholder="Chọn vai trò cho người dùng">
-              <Select.Option value="ROLE_ADMIN">Admin</Select.Option>
-              <Select.Option value="ROLE_HEAD_DEPT">Trưởng khoa</Select.Option>
-              <Select.Option value="ROLE_DOCTOR">Bác sĩ</Select.Option>
-              <Select.Option value="ROLE_STAFF">Lễ tân</Select.Option>
-            </Select>
-          </Form.Item>
+        <form onSubmit={handleSubmit} className="admin-form">
+          <div className="form-grid-2">
+            <div className="form-group">
+              <label>Tên đăng nhập *</label>
+              <input name="username" value={form.username} onChange={handleChange} required placeholder="VD: bs.nguyenvana" />
+            </div>
+            <div className="form-group">
+              <label>{editingId ? 'Mật khẩu mới (để trống nếu không đổi)' : 'Mật khẩu *'}</label>
+              <input name="password" type="password" value={form.password} onChange={handleChange} required={!editingId} placeholder="Tối thiểu 8 ký tự" />
+            </div>
+          </div>
+          <div className="form-grid-2">
+            <div className="form-group">
+              <label>Email *</label>
+              <input name="email" type="email" value={form.email} onChange={handleChange} required placeholder="email@clinic.vn" />
+            </div>
+            <div className="form-group">
+              <label>Số điện thoại</label>
+              <input name="phone" value={form.phone} onChange={handleChange} placeholder="0901 234 567" />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Họ và tên *</label>
+            <input name="fullName" value={form.fullName} onChange={handleChange} required placeholder="VD: Nguyễn Văn A" />
+          </div>
+          <div className="form-grid-2">
+            <div className="form-group">
+              <label>Vai trò *</label>
+              <select name="roleName" value={form.roleName} onChange={handleChange} required>
+                <option value="">-- Chọn vai trò --</option>
+                {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Trạng thái</label>
+              <select name="isActive" value={form.isActive ? '1' : '0'} onChange={e => setForm(p => ({ ...p, isActive: e.target.value === '1' }))}>
+                <option value="1">Hoạt động</option>
+                <option value="0">Vô hiệu hóa</option>
+              </select>
+            </div>
+          </div>
 
-          {/* Các trường chỉ hiển thị khi vai trò là Bác sĩ */}
-          {selectedRole === 'ROLE_DOCTOR' && (
+          {/* Doctor-specific fields */}
+          {isDoctor && (
             <>
-              <Form.Item name="specialtyId" label="Chuyên khoa" rules={[{ required: true, message: 'Vui lòng chọn chuyên khoa!' }]}>
-                <Select placeholder="Chọn chuyên khoa cho bác sĩ">
-                  {specialties.map(spec => (
-                    <Select.Option key={spec.id} value={spec.id}>{spec.name}</Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item name="degree" label="Học vị" rules={[{ required: true, message: 'Vui lòng nhập học vị!' }]}>
-                <Input placeholder="Ví dụ: Thạc sĩ, Bác sĩ Chuyên khoa I..." />
-              </Form.Item>
+              <div className="section-divider">Thông tin bác sĩ</div>
+              <div className="form-grid-2">
+                <div className="form-group">
+                  <label>Học vị *</label>
+                  <select name="degree" value={form.degree} onChange={handleChange} required>
+                    {DEGREES.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Phòng khám</label>
+                  <input name="roomNumber" value={form.roomNumber} onChange={handleChange} placeholder="VD: P101" />
+                </div>
+              </div>
+              <div className="form-grid-2">
+                <div className="form-group">
+                  <label>Chuyên khoa *</label>
+                  <select name="specialtyId" value={form.specialtyId} onChange={handleChange} required>
+                    <option value="">-- Chọn chuyên khoa --</option>
+                    {specialties.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Phí khám (VNĐ)</label>
+                  <input name="consultationFee" type="number" min="0" value={form.consultationFee} onChange={handleChange} placeholder="150000" />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Tiểu sử / Giới thiệu</label>
+                <textarea name="bio" value={form.bio} onChange={handleChange} rows={2} placeholder="Kinh nghiệm, chuyên môn..." />
+              </div>
             </>
           )}
 
           <div className="form-actions">
-            <Button className="btn-cancel" onClick={() => {
-              setIsModalVisible(false);
-              form.resetFields();
-              setSelectedRole('');
-            }}>Hủy</Button>
-            <Button type="primary" htmlType="submit" className="btn-submit">Lưu</Button>
+            <button type="button" className="btn-cancel" onClick={closeModal}>Hủy</button>
+            <button type="submit" className="btn-submit" disabled={isPending}>
+              {isPending ? 'Đang lưu...' : 'Lưu người dùng'}
+            </button>
           </div>
-        </Form>
+        </form>
       </Modal>
     </div>
   );

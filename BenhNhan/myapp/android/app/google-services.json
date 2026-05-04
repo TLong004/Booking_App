@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "324580037483",
+    "project_id": "bookingapp-bb350",
+    "storage_bucket": "bookingapp-bb350.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324580037483:android:fcc05358156fc9ef68f22e",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRfU00i1h0lLfj_yFwM6SSZQJHS0aqZIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

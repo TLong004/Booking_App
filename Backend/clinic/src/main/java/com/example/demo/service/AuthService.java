@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.FirebaseAuthRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.Patient;
 import com.example.demo.entity.Role;
@@ -7,24 +8,23 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.PatientRepository;
 import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
+
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final PatientRepository patientRepository;
-
-    public AuthService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, PatientRepository patientRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.patientRepository = patientRepository;
-    }
 
     @Transactional
     public User registerPatient(RegisterRequest registerRequest) {
@@ -53,5 +53,36 @@ public class AuthService {
         patientRepository.save(patient);
 
         return savedUser;
+    }
+
+    @Transactional
+    public User authenticateWithFirebase(FirebaseAuthRequest request) throws Exception {
+        // 1. Xác thực token với Firebase Admin SDK
+        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(request.getToken());
+        String email = decodedToken.getEmail();
+        
+        if (email == null) {
+            throw new IllegalArgumentException("Token Firebase không chứa email hợp lệ!");
+        }
+
+        // 2. Kiểm tra user trong Database, nếu chưa có thì tự động tạo mới
+        return userRepository.findByEmail(email).orElseGet(() -> {
+            User newUser = new User();
+            newUser.setUsername(email); // Dùng email làm username
+            newUser.setEmail(email);
+            newUser.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString())); // Password không còn dùng nữa do Firebase quản lý
+            
+            Role patientRole = roleRepository.findByRoleName("ROLE_PATIENT")
+                    .orElseThrow(() -> new RuntimeException("Lỗi hệ thống: Không tìm thấy quyền ROLE_PATIENT!"));
+            newUser.getRoles().add(patientRole);
+            User savedUser = userRepository.save(newUser);
+
+            Patient patient = new Patient();
+            patient.setUserId(savedUser.getId());
+            patient.setFullName(request.getFullName() != null ? request.getFullName() : "Bệnh nhân mới");
+            patientRepository.save(patient);
+
+            return savedUser;
+        });
     }
 }

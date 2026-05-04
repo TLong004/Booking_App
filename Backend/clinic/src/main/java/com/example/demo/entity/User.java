@@ -12,7 +12,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Data
-@EqualsAndHashCode(exclude = "roles") // Tránh lỗi lặp vô hạn (infinite recursion) của Lombok
+@EqualsAndHashCode(exclude = "roles") 
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

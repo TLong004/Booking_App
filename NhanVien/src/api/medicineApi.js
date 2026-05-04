@@ -1,9 +1,8 @@
 import axiosClient from './axiosClient';
 
 export const medicineApi = {
-  getAll: () => axiosClient.get('/medicines'),
-  getById: (id) => axiosClient.get(`/medicines/${id}`),
-  create: (data) => axiosClient.post('/medicines', data),
-  update: (id, data) => axiosClient.put(`/medicines/${id}`, data),
-  delete: (id) => axiosClient.delete(`/medicines/${id}`),
+  getAll: () => axiosClient.get('/admin/medicines'),
+  create: (data) => axiosClient.post('/admin/medicines', data),
+  update: (id, data) => axiosClient.put(`/admin/medicines/${id}`, data),
+  delete: (id) => axiosClient.delete(`/admin/medicines/${id}`),
 };

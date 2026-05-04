@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "patients")
@@ -12,7 +13,7 @@ public class Patient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", unique = true)
+    @Column(name = "user_id")
     private Long userId;
 
     @Column(name = "full_name", nullable = false)
@@ -21,4 +22,7 @@ public class Patient {
     private LocalDate dob;
     private String gender;
     private String address;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }

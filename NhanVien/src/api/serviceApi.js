@@ -1,9 +1,8 @@
 import axiosClient from './axiosClient';
 
 export const serviceApi = {
-  getAll: () => axiosClient.get('/services'),
-  getById: (id) => axiosClient.get(`/services/${id}`),
-  create: (data) => axiosClient.post('/services', data),
-  update: (id, data) => axiosClient.put(`/services/${id}`, data),
-  delete: (id) => axiosClient.delete(`/services/${id}`),
+  getAll: () => axiosClient.get('/admin/services'),
+  create: (data) => axiosClient.post('/admin/services', data),
+  update: (id, data) => axiosClient.put(`/admin/services/${id}`, data),
+  delete: (id) => axiosClient.delete(`/admin/services/${id}`),
 };

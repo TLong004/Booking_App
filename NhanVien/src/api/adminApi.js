@@ -1,37 +1,15 @@
 import axiosClient from './axiosClient';
 
 export const adminApi = {
-  // Quản lý người dùng
-  getAllUsers: async () => {
-    const response = await axiosClient.get('/admin/users');
-    return response.data;
-  },
-  createUser: async (userData) => {
-    const response = await axiosClient.post('/admin/users', userData);
-    return response.data;
-  },
-  
-  // Quản lý chuyên khoa
-  getAllSpecialties: async () => {
-    const response = await axiosClient.get('/admin/specialties');
-    return response.data;
-  },
-  createSpecialty: async (specialtyData) => {
-    const response = await axiosClient.post('/admin/specialties', specialtyData);
-    return response.data;
-  },
-  
-  // Quản lý dịch vụ
-  getAllServices: async () => {
-    const response = await axiosClient.get('/admin/services');
-    return response.data;
-  },
-  getServicesBySpecialty: async (specialtyId) => {
-    const response = await axiosClient.get(`/admin/specialties/${specialtyId}/services`);
-    return response.data;
-  },
-  createService: async (serviceData) => {
-    const response = await axiosClient.post('/admin/services', serviceData);
-    return response.data;
-  }
+  // Quản lý Người dùng
+  getAllUsers: () => axiosClient.get('/admin/users'),
+  createUser: (data) => axiosClient.post('/admin/users', data),
+  updateUser: (id, data) => axiosClient.put(`/admin/users/${id}`, data),
+  deleteUser: (id) => axiosClient.delete(`/admin/users/${id}`),
+
+  // Quản lý Chuyên khoa
+  getAllSpecialties: () => axiosClient.get('/admin/specialties'),
+  createSpecialty: (data) => axiosClient.post('/admin/specialties', data),
+  updateSpecialty: (id, data) => axiosClient.put(`/admin/specialties/${id}`, data),
+  deleteSpecialty: (id) => axiosClient.delete(`/admin/specialties/${id}`),
 };
