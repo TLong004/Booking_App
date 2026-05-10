@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:myapp/services/bloc/auth_bloc.dart';
+import 'package:myapp/logic/auth/auth_bloc.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   final _emailController = TextEditingController();

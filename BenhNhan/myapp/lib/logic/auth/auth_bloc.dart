@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:myapp/core/network/api_client.dart';
 import 'package:myapp/models/user.dart';
 import 'package:myapp/repositories/user_reponsitory.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,6 +16,7 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       try {
         final user = await _authReponsitory.getUser(event.email, event.password);
+        ApiClient.setToken(user.token);
         emit(AuthSuccess(user));
       } on FirebaseAuthException catch (e) {
         emit(AuthFailure(_getFirebaseErrorMessage(e)));
@@ -48,7 +50,8 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       try {
         await _authReponsitory.signOut();
-        emit(AuthInitial()); // Chuyển state về Initial khi đăng xuất thành công
+        ApiClient.setToken(null);
+        emit(AuthInitial());
       } catch (e) {
         emit(AuthFailure(e.toString().replaceAll('Exception: ', '')));
       }
@@ -76,7 +79,9 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
 
   @override
   AuthState? fromJson(Map<String, dynamic> json) {
-    return AuthSuccess(UserModel.fromJson(json));
+    final user = UserModel.fromJson(json);
+    ApiClient.setToken(user.token);
+    return AuthSuccess(user);
   }
 
   @override

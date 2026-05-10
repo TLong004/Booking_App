@@ -23,4 +23,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT count(u) FROM User u JOIN u.roles r WHERE r.roleName = 'ROLE_PATIENT' AND u.createdAt >= :startOfDay")
     long countNewPatientsToday(@Param("startOfDay") LocalDateTime startOfDay);
+
+    Page<User> findByDeletedAtIsNull(Pageable pageable);
 }

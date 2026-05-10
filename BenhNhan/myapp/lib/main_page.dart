@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/pages/appointments/appoinment_page.dart';
+import 'package:myapp/pages/appointments/screens/appoinment_page.dart';
 import 'package:myapp/pages/home/screens/home_page.dart';
 import 'package:myapp/pages/notifications/notification_page.dart';
 import 'package:myapp/pages/profile/profile_page.dart';
-import 'package:myapp/pages/records/record_page.dart';
+import 'package:myapp/pages/records/screens/record_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import DayCell from './components/DayCell';
-import DetailPanel from './components/DetailPanel';
+import DayCell from './DayCell';
+import DetailPanel from './DetailPanel';
 import { 
   SHIFT_DATA, SHIFT_STYLE, WEEKDAYS, MONTHS, 
   getDaysInMonth, getFirstDayOfMonth, dateKey, computeStats 

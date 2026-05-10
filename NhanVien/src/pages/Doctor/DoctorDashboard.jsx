@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import PatientQueue from './components/PatientQueue';
-import ConsultationPanel from './components/ConsultationPanel';
-import Toast from './components/Toast';
+import PatientQueue from './PatientQueue';
+import ConsultationPanel from './ConsultationPanel';
+import Toast from './Toast';
 import { consultationApi } from '../../api/consultationApi';
 import './DoctorDashboard.css';
 

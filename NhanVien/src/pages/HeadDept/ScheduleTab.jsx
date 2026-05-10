@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { now, fk, todayKey, buildInitialSchedule, getDoc, getDates, SHIFT_META, DOT_COLORS, DOCS } from '../headDeptData';
+import { now, fk, todayKey, buildInitialSchedule, getDoc, getDates, SHIFT_META, DOT_COLORS, DOCS } from './headDeptData';
 import { Avatar, ShiftTag, Toast } from './SharedUI';
 
 export default function ScheduleTab() {

@@ -50,6 +50,7 @@ public class AuthService {
         Patient patient = new Patient();
         patient.setUserId(savedUser.getId());
         patient.setFullName(registerRequest.getFullName());
+        patient.setIsOwner(true);
         patientRepository.save(patient);
 
         return savedUser;
@@ -80,6 +81,7 @@ public class AuthService {
             Patient patient = new Patient();
             patient.setUserId(savedUser.getId());
             patient.setFullName(request.getFullName() != null ? request.getFullName() : "Bệnh nhân mới");
+            patient.setIsOwner(true);
             patientRepository.save(patient);
 
             return savedUser;

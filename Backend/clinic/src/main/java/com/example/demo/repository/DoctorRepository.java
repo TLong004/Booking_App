@@ -16,4 +16,8 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
     @Query("SELECT d FROM Doctor d WHERE (:keyword IS NULL OR LOWER(d.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND (:specialtyId IS NULL OR d.specialtyId = :specialtyId) AND (:degree IS NULL OR LOWER(d.degree) = LOWER(:degree))")
     Page<Doctor> searchDoctors(@Param("keyword") String keyword, @Param("specialtyId") Long specialtyId, @Param("degree") String degree, Pageable pageable);
+
+    List<Doctor> findByRatingGreaterThanEqualOrderByRatingDesc(Double minRating);
+
+    List<Doctor> findTop5ByRatingNotNullOrderByRatingDesc();
 }

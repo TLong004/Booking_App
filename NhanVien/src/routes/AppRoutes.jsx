@@ -28,12 +28,17 @@ const Loadable = (Component) => (props) => (
 
 // Lazy load các trang chức năng (Code Splitting)
 const StaffDashboard = Loadable(React.lazy(() => import('../pages/staff/StaffDashboard')));
-const AdminDashboard = Loadable(React.lazy(() => import('../pages/admin/AdminDashboard')));
-const DoctorManagementPage = Loadable(React.lazy(() => import('../pages/admin/DoctorManagementPage')));
-const UserManagementPage = Loadable(React.lazy(() => import('../pages/admin/UserManagementPage')));
-const SpecialtyManagementPage = Loadable(React.lazy(() => import('../pages/admin/SpecialtyManagementPage')));
-const ServiceManagementPage = Loadable(React.lazy(() => import('../pages/admin/ServiceManagementPage')));
-const MedicineManagementPage = Loadable(React.lazy(() => import('../pages/admin/MedicineManagementPage')));
+const AdminDashboard = Loadable(React.lazy(() => import('../pages/Admin/AdminDashboard')));
+const DoctorManagementPage = Loadable(React.lazy(() => import('../pages/Admin/DoctorManagementPage')));
+const UserManagementPage = Loadable(React.lazy(() => import('../pages/Admin/UserManagementPage')));
+const SpecialtyManagementPage = Loadable(React.lazy(() => import('../pages/Admin/SpecialtyManagementPage')));
+const ServiceManagementPage = Loadable(React.lazy(() => import('../pages/Admin/ServiceManagementPage')));
+const MedicineManagementPage = Loadable(React.lazy(() => import('../pages/Admin/MedicineManagementPage')));
+const AppointmentManagementPage = Loadable(React.lazy(() => import('../pages/Admin/AppointmentManagementPage')));
+const PatientManagementPage = Loadable(React.lazy(() => import('../pages/Admin/PatientManagementPage')));
+const InvoiceManagementPage = Loadable(React.lazy(() => import('../pages/Admin/InvoiceManagementPage')));
+const ReviewManagementPage = Loadable(React.lazy(() => import('../pages/Admin/ReviewManagementPage')));
+const ReportsPage = Loadable(React.lazy(() => import('../pages/Admin/ReportsPage')));
 const DoctorDashboard = Loadable(React.lazy(() => import('../pages/doctor/DoctorDashboard')));
 const DoctorSchedule = Loadable(React.lazy(() => import('../pages/doctor/DoctorSchedule')));
 const HeadDeptDashboard = Loadable(React.lazy(() => import('../pages/headdept/HeadDeptDashboard')));
@@ -83,6 +88,11 @@ const AppRoutes = () => {
             <Route path="/admin/specialties" element={<SpecialtyManagementPage />} />
             <Route path="/admin/services" element={<ServiceManagementPage />} />
             <Route path="/admin/medicines" element={<MedicineManagementPage />} />
+            <Route path="/admin/appointments" element={<AppointmentManagementPage />} />
+            <Route path="/admin/patients" element={<PatientManagementPage />} />
+            <Route path="/admin/invoices" element={<InvoiceManagementPage />} />
+            <Route path="/admin/reviews" element={<ReviewManagementPage />} />
+            <Route path="/admin/reports" element={<ReportsPage />} />
             {/* Redirect từ /admin về /admin/dashboard */}
             <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
           </Route>

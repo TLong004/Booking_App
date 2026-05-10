@@ -1,5 +1,5 @@
 import React from 'react';
-import { PERF } from '../headDeptData';
+import { PERF } from './headDeptData';
 import { StatCard, DonutChart } from './SharedUI';
 
 export default function AnalyticsTab() {

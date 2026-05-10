@@ -7,9 +7,9 @@ import './AdminDashboard.css';
 
 const ROLES = [
   { value: 'ROLE_ADMIN',     label: 'Admin',       badgeClass: 'badge badge-red'    },
-  { value: 'ROLE_HEAD_DEPT', label: 'Head Dept',   badgeClass: 'badge badge-purple' },
-  { value: 'ROLE_DOCTOR',    label: 'Doctor',      badgeClass: 'badge badge-blue'   },
-  { value: 'ROLE_STAFF',     label: 'Staff',       badgeClass: 'badge badge-orange' },
+  { value: 'ROLE_HEAD_DEPT', label: 'Trưởng khoa', badgeClass: 'badge badge-purple' },
+  { value: 'ROLE_DOCTOR',    label: 'Bác sĩ',      badgeClass: 'badge badge-blue'   },
+  { value: 'ROLE_STAFF',     label: 'Nhân viên',   badgeClass: 'badge badge-orange' },
 ];
 
 const DEGREES = ['Bác sĩ', 'Thạc sĩ', 'Tiến sĩ', 'Phó giáo sư', 'Giáo sư'];
@@ -19,45 +19,52 @@ const ROLE_MAP = Object.fromEntries(ROLES.map(r => [r.value, r]));
 const DOCTOR_ROLES = ['ROLE_DOCTOR', 'ROLE_HEAD_DEPT'];
 
 const EMPTY_FORM = {
-  username: '', password: '', email: '', phone: '', fullName: '',
+  username: '', password: '', email: '', phone: '',
   roleName: '', isActive: true,
   // Doctor-specific
-  specialtyId: '', degree: 'Bác sĩ', roomNumber: '', consultationFee: '', bio: '',
+  fullName: '', specialtyId: '', degree: 'Bác sĩ',
+  roomNumber: '', consultationFee: '', bio: '',
 };
 
 const UserManagementPage = () => {
   const queryClient = useQueryClient();
 
-  // Filters
-  const [search, setSearch]     = useState('');
-  const [filterRole, setRole]   = useState('');
+  const [search, setSearch]       = useState('');
+  const [filterRole, setRole]     = useState('');
   const [filterStatus, setStatus] = useState('');
 
-  // Modal
   const [isOpen, setIsOpen]       = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm]           = useState(EMPTY_FORM);
+  const [apiError, setApiError]   = useState('');
 
-  // Data
+  const [resetModal, setResetModal]   = useState(null); // { id, username }
+  const [newPassword, setNewPassword] = useState('');
+  const [resetError, setResetError]   = useState('');
+
+  // ── Data queries ──────────────────────────────────────────────────────
   const { data: usersRes, isLoading, error } = useQuery({
     queryKey: ['admin-users'],
     queryFn: adminApi.getAllUsers,
   });
   const { data: specialtiesRes } = useQuery({
-    queryKey: ['specialties'],
+    queryKey: ['admin-specialties'],
     queryFn: adminApi.getAllSpecialties,
   });
 
-  const users      = usersRes?.data ?? [];
-  const specialties = specialtiesRes?.data ?? [];
+  // BE trả về { data: [...], currentPage, totalItems, totalPages }
+  // Axios bọc thêm 1 lớp response.data → phải lấy response.data.data
+  const users       = usersRes?.data?.data ?? [];
+  const specialties = specialtiesRes?.data?.data ?? [];
 
-  // Filtered list
+  // ── Client-side filter ────────────────────────────────────────────────
   const filtered = useMemo(() => {
     return users.filter(u => {
       const roleStr = u.roles?.[0]?.roleName ?? '';
       const matchSearch = !search ||
         u.username?.toLowerCase().includes(search.toLowerCase()) ||
-        u.email?.toLowerCase().includes(search.toLowerCase());
+        u.email?.toLowerCase().includes(search.toLowerCase()) ||
+        u.phone?.includes(search);
       const matchRole   = !filterRole   || roleStr === filterRole;
       const matchStatus = !filterStatus ||
         (filterStatus === 'active' ? u.isActive : !u.isActive);
@@ -65,46 +72,67 @@ const UserManagementPage = () => {
     });
   }, [users, search, filterRole, filterStatus]);
 
-  // Mutations
+  // ── Mutations ─────────────────────────────────────────────────────────
   const createMutation = useMutation({
     mutationFn: adminApi.createUser,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-users'] }); closeModal(); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      closeModal();
+    },
+    onError: (err) => setApiError(err.response?.data?.message || 'Tạo người dùng thất bại!'),
   });
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => adminApi.updateUser(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-users'] }); closeModal(); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      closeModal();
+    },
+    onError: (err) => setApiError(err.response?.data?.message || 'Cập nhật thất bại!'),
   });
   const deleteMutation = useMutation({
     mutationFn: adminApi.deleteUser,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-users'] }),
   });
+  const toggleMutation = useMutation({
+    mutationFn: adminApi.toggleUserStatus,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-users'] }),
+  });
+  const resetMutation = useMutation({
+    mutationFn: ({ id, newPassword }) => adminApi.resetPassword(id, newPassword),
+    onSuccess: () => { setResetModal(null); setNewPassword(''); setResetError(''); },
+    onError: (err) => setResetError(err.response?.data?.message || 'Đặt lại mật khẩu thất bại!'),
+  });
 
   const openAdd = () => {
     setForm(EMPTY_FORM);
     setEditingId(null);
+    setApiError('');
     setIsOpen(true);
   };
 
   const openEdit = (user) => {
+    const roleStr = user.roles?.[0]?.roleName ?? '';
     setForm({
       username:        user.username,
       password:        '',
       email:           user.email ?? '',
       phone:           user.phone ?? '',
-      fullName:        user.fullName ?? '',
-      roleName:        user.roles?.[0]?.roleName ?? '',
+      roleName:        roleStr,
       isActive:        user.isActive ?? true,
-      specialtyId:     user.doctor?.specialtyId ?? '',
+      // Doctor fields – chỉ có nếu user là bác sĩ
+      fullName:        user.doctor?.fullName ?? '',
+      specialtyId:     user.doctor?.specialty?.id ?? '',
       degree:          user.doctor?.degree ?? 'Bác sĩ',
       roomNumber:      user.doctor?.roomNumber ?? '',
       consultationFee: user.doctor?.consultationFee ?? '',
       bio:             user.doctor?.bio ?? '',
     });
     setEditingId(user.id);
+    setApiError('');
     setIsOpen(true);
   };
 
-  const closeModal = () => { setIsOpen(false); setEditingId(null); };
+  const closeModal = () => { setIsOpen(false); setEditingId(null); setApiError(''); };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -113,8 +141,9 @@ const UserManagementPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setApiError('');
     const payload = { ...form };
-    if (!payload.password && editingId) delete payload.password; // don't send empty pw on edit
+    if (!payload.password && editingId) delete payload.password;
     if (editingId) updateMutation.mutate({ id: editingId, data: payload });
     else createMutation.mutate(payload);
   };
@@ -124,15 +153,23 @@ const UserManagementPage = () => {
       deleteMutation.mutate(user.id);
   };
 
-  const isDoctor = DOCTOR_ROLES.includes(form.roleName);
+  const handleToggle = (user) => {
+    if (window.confirm(`${user.isActive ? 'Vô hiệu hóa' : 'Kích hoạt'} tài khoản "${user.username}"?`))
+      toggleMutation.mutate(user.id);
+  };
+
+  const isDoctor  = DOCTOR_ROLES.includes(form.roleName);
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   const columns = [
     { header: 'Tên đăng nhập', accessor: 'username', width: '18%', cell: r => <strong>{r.username}</strong> },
-    { header: 'Email',         accessor: 'email',    width: '24%' },
-    { header: 'Điện thoại',    accessor: 'phone',    width: '16%' },
+    { header: 'Email',         accessor: 'email',    width: '22%' },
+    { header: 'Điện thoại',    accessor: 'phone',    width: '14%' },
+    { header: 'Họ và tên',    accessor: 'doctor',   width: '18%',
+      cell: r => <span>{r.doctor?.fullName ?? '—'}</span>,
+    },
     {
-      header: 'Vai trò', accessor: 'roles', width: '16%',
+      header: 'Vai trò', accessor: 'roles', width: '14%',
       cell: r => {
         const roleName = r.roles?.[0]?.roleName ?? '';
         const meta = ROLE_MAP[roleName];
@@ -142,7 +179,7 @@ const UserManagementPage = () => {
       },
     },
     {
-      header: 'Trạng thái', accessor: 'isActive', width: '12%',
+      header: 'Trạng thái', accessor: 'isActive', width: '14%',
       cell: r => (
         <span className={`badge ${r.isActive ? 'badge-green' : 'badge-red'}`}>
           {r.isActive ? 'Hoạt động' : 'Vô hiệu'}
@@ -162,7 +199,7 @@ const UserManagementPage = () => {
       <div className="filter-bar">
         <input
           type="text"
-          placeholder="Tìm theo tên, email..."
+          placeholder="Tìm theo tên, email, SĐT..."
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -179,14 +216,26 @@ const UserManagementPage = () => {
       </div>
 
       {isLoading && <p style={{ color: '#6b7280', fontSize: 13 }}>Đang tải...</p>}
-      {error && <p className="error-message">Lỗi: {error.message}</p>}
+      {error    && <p className="error-message">Lỗi: {error.message}</p>}
 
       <DataTable
         columns={columns}
         data={filtered}
         renderActions={user => (
           <>
-            <button className="action-btn edit-btn"   onClick={() => openEdit(user)}>Sửa</button>
+            <button className="action-btn edit-btn" onClick={() => openEdit(user)}>Sửa</button>
+            <button
+              className="action-btn view-btn"
+              onClick={() => { setResetModal({ id: user.id, username: user.username }); setNewPassword(''); setResetError(''); }}
+            >
+              Đặt lại MK
+            </button>
+            <button
+              className={`action-btn ${user.isActive ? 'delete-btn' : 'edit-btn'}`}
+              onClick={() => handleToggle(user)}
+            >
+              {user.isActive ? 'Vô hiệu' : 'Kích hoạt'}
+            </button>
             <button className="action-btn delete-btn" onClick={() => handleDelete(user)}>Xóa</button>
           </>
         )}
@@ -198,30 +247,41 @@ const UserManagementPage = () => {
         title={editingId ? 'Sửa thông tin người dùng' : 'Thêm người dùng mới'}
       >
         <form onSubmit={handleSubmit} className="admin-form">
+          {apiError && <p className="error-message" style={{ marginBottom: 10 }}>{apiError}</p>}
+
           <div className="form-grid-2">
             <div className="form-group">
               <label>Tên đăng nhập *</label>
-              <input name="username" value={form.username} onChange={handleChange} required placeholder="VD: bs.nguyenvana" />
+              <input
+                name="username" value={form.username} onChange={handleChange}
+                required placeholder="VD: bs.nguyenvana"
+                disabled={!!editingId}
+              />
             </div>
             <div className="form-group">
               <label>{editingId ? 'Mật khẩu mới (để trống nếu không đổi)' : 'Mật khẩu *'}</label>
-              <input name="password" type="password" value={form.password} onChange={handleChange} required={!editingId} placeholder="Tối thiểu 8 ký tự" />
+              <input
+                name="password" type="password" value={form.password}
+                onChange={handleChange} required={!editingId}
+                placeholder="Tối thiểu 8 ký tự"
+              />
             </div>
           </div>
+
           <div className="form-grid-2">
             <div className="form-group">
               <label>Email *</label>
-              <input name="email" type="email" value={form.email} onChange={handleChange} required placeholder="email@clinic.vn" />
+              <input
+                name="email" type="email" value={form.email}
+                onChange={handleChange} required placeholder="email@clinic.vn"
+              />
             </div>
             <div className="form-group">
               <label>Số điện thoại</label>
               <input name="phone" value={form.phone} onChange={handleChange} placeholder="0901 234 567" />
             </div>
           </div>
-          <div className="form-group">
-            <label>Họ và tên *</label>
-            <input name="fullName" value={form.fullName} onChange={handleChange} required placeholder="VD: Nguyễn Văn A" />
-          </div>
+
           <div className="form-grid-2">
             <div className="form-group">
               <label>Vai trò *</label>
@@ -232,7 +292,11 @@ const UserManagementPage = () => {
             </div>
             <div className="form-group">
               <label>Trạng thái</label>
-              <select name="isActive" value={form.isActive ? '1' : '0'} onChange={e => setForm(p => ({ ...p, isActive: e.target.value === '1' }))}>
+              <select
+                name="isActive"
+                value={form.isActive ? '1' : '0'}
+                onChange={e => setForm(p => ({ ...p, isActive: e.target.value === '1' }))}
+              >
                 <option value="1">Hoạt động</option>
                 <option value="0">Vô hiệu hóa</option>
               </select>
@@ -243,6 +307,13 @@ const UserManagementPage = () => {
           {isDoctor && (
             <>
               <div className="section-divider">Thông tin bác sĩ</div>
+              <div className="form-group">
+                <label>Họ và tên *</label>
+                <input
+                  name="fullName" value={form.fullName} onChange={handleChange}
+                  required placeholder="VD: Nguyễn Văn A"
+                />
+              </div>
               <div className="form-grid-2">
                 <div className="form-group">
                   <label>Học vị *</label>
@@ -265,12 +336,19 @@ const UserManagementPage = () => {
                 </div>
                 <div className="form-group">
                   <label>Phí khám (VNĐ)</label>
-                  <input name="consultationFee" type="number" min="0" value={form.consultationFee} onChange={handleChange} placeholder="150000" />
+                  <input
+                    name="consultationFee" type="number" min="0"
+                    value={form.consultationFee} onChange={handleChange}
+                    placeholder="150000"
+                  />
                 </div>
               </div>
               <div className="form-group">
                 <label>Tiểu sử / Giới thiệu</label>
-                <textarea name="bio" value={form.bio} onChange={handleChange} rows={2} placeholder="Kinh nghiệm, chuyên môn..." />
+                <textarea
+                  name="bio" value={form.bio} onChange={handleChange}
+                  rows={2} placeholder="Kinh nghiệm, chuyên môn..."
+                />
               </div>
             </>
           )}
@@ -279,6 +357,36 @@ const UserManagementPage = () => {
             <button type="button" className="btn-cancel" onClick={closeModal}>Hủy</button>
             <button type="submit" className="btn-submit" disabled={isPending}>
               {isPending ? 'Đang lưu...' : 'Lưu người dùng'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+      {/* Reset password modal */}
+      <Modal
+        isOpen={!!resetModal}
+        onClose={() => setResetModal(null)}
+        title={`Đặt lại mật khẩu — ${resetModal?.username}`}
+      >
+        <form
+          onSubmit={(e) => { e.preventDefault(); resetMutation.mutate({ id: resetModal.id, newPassword }); }}
+          className="admin-form"
+        >
+          {resetError && <p className="error-message" style={{ marginBottom: 10 }}>{resetError}</p>}
+          <div className="form-group">
+            <label>Mật khẩu mới *</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              required
+              minLength={6}
+              placeholder="Tối thiểu 6 ký tự"
+            />
+          </div>
+          <div className="form-actions">
+            <button type="button" className="btn-cancel" onClick={() => setResetModal(null)}>Hủy</button>
+            <button type="submit" className="btn-submit" disabled={resetMutation.isPending}>
+              {resetMutation.isPending ? 'Đang lưu...' : 'Xác nhận'}
             </button>
           </div>
         </form>

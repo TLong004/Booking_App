@@ -105,20 +105,26 @@ public class AdminController {
 
     @GetMapping("/dashboard/recent-appointments")
     public ResponseEntity<?> getRecentAppointments() {
-        // Trả về Mock Data chuẩn cấu trúc yêu cầu do Entity Appointment chưa hoàn thiện
-        List<Map<String, Object>> mockAppointments = List.<Map<String, Object>>of(
-            Map.<String, Object>of(
-                "id", 101,
-                "appointmentDate", "2025-05-03",
-                "queueNumber", 1,
-                "status", "COMPLETED",
-                "patient", Map.of("id", 1, "fullName", "Nguyễn Văn A"),
-                "doctor", Map.of("id", 1, "fullName", "TS.BS. Trần Minh Khoa"),
-                "slot", Map.of("startTime", "08:00:00"),
-                "serviceOrders", List.of(Map.of("service", Map.of("name", "Khám tổng quát")))
-            )
-        );
-        return ResponseEntity.ok(Map.of("data", mockAppointments));
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Appointment> page = appointmentRepository.findAll(pageable);
+
+        List<Map<String, Object>> responseList = page.getContent().stream().map(app -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", app.getId());
+            map.put("appointmentDate", app.getAppointmentDate());
+            map.put("status", app.getStatus());
+            map.put("queueNumber", app.getQueueNumber());
+            map.put("symptoms", app.getSymptoms());
+            if (app.getPatientId() != null)
+                patientRepository.findById(app.getPatientId()).ifPresent(p ->
+                    map.put("patient", Map.of("id", p.getId(), "fullName", p.getFullName())));
+            if (app.getDoctorId() != null)
+                doctorRepository.findById(app.getDoctorId()).ifPresent(d ->
+                    map.put("doctor", Map.of("id", d.getId(), "fullName", d.getFullName())));
+            return map;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(Map.of("data", responseList));
     }
 
     @GetMapping("/dashboard/low-stock-alerts")
@@ -139,7 +145,7 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userRepository.searchUsers(search, isActive, roleName, pageable);
+        Page<User> userPage = userRepository.findByDeletedAtIsNull(pageable);
 
         List<Map<String, Object>> responseList = userPage.getContent().stream().map(user -> {
             Map<String, Object> map = new HashMap<>();
@@ -241,7 +247,7 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Doctor> doctorPage = doctorRepository.searchDoctors(search, specialtyId, degree, pageable);
+        Page<Doctor> doctorPage = doctorRepository.findAll(pageable);
 
         List<Map<String, Object>> responseList = doctorPage.getContent().stream().map(doc -> {
             Map<String, Object> map = new HashMap<>();
@@ -322,14 +328,25 @@ public class AdminController {
     public ResponseEntity<?> getAllPatients(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String gender,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dob,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Patient> patientPage = patientRepository.searchPatients(search, gender, dob, pageable);
 
-        return buildPaginatedResponse(patientPage, patientPage.getContent());
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Patient> patientPage = patientRepository.findByDeletedAtIsNull(pageable);
+
+        List<Map<String, Object>> responseList = patientPage.getContent().stream().map(p -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id",        p.getId());
+            map.put("fullName",  p.getFullName());
+            map.put("dob",       p.getDob());
+            map.put("gender",    p.getGender());
+            map.put("address",   p.getAddress());
+            map.put("userId",    p.getUserId());
+            map.put("createdAt", p.getDeletedAt()); // deletedAt used as proxy; real createdAt missing in schema
+            return map;
+        }).collect(Collectors.toList());
+
+        return buildPaginatedResponse(patientPage, responseList);
     }
 
     @GetMapping("/patients/{id}")
@@ -417,7 +434,7 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<Specialty> specialtyPage = specialtyRepository.searchSpecialties(search, pageable);
+        Page<Specialty> specialtyPage = specialtyRepository.findAll(pageable);
 
         List<Map<String, Object>> responseList = specialtyPage.getContent().stream().map(spec -> {
             Map<String, Object> map = new HashMap<>();
@@ -463,16 +480,11 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<ClinicService> servicePage = clinicServiceRepository.searchServices(search, pageable);
+        Page<ClinicService> servicePage = clinicServiceRepository.findAll(pageable);
 
         return buildPaginatedResponse(servicePage, servicePage.getContent());
     }
     
-    @GetMapping("/specialties/{specialtyId}/services")
-    public ResponseEntity<?> getServicesBySpecialty(@PathVariable Long specialtyId) {
-        return ResponseEntity.ok(clinicServiceRepository.findBySpecialtyId(specialtyId));
-    }
-
     @PostMapping("/services")
     public ResponseEntity<?> createService(@RequestBody ClinicService service) {
         return ResponseEntity.ok(clinicServiceRepository.save(service));
@@ -498,7 +510,7 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<Medicine> medicinePage = medicineRepository.searchMedicines(search, unit, pageable);
+        Page<Medicine> medicinePage = medicineRepository.findAll(pageable);
 
         return buildPaginatedResponse(medicinePage, medicinePage.getContent());
     }
@@ -569,7 +581,7 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<Appointment> appointmentPage = appointmentRepository.searchAppointments(date, doctorId, specialtyId, status, pageable);
+        Page<Appointment> appointmentPage = appointmentRepository.findAll(pageable);
 
         List<Map<String, Object>> responseList = appointmentPage.getContent().stream().map(app -> {
             Map<String, Object> map = new HashMap<>();
@@ -577,9 +589,21 @@ public class AdminController {
             map.put("appointmentDate", app.getAppointmentDate());
             map.put("status", app.getStatus());
             map.put("queueNumber", app.getQueueNumber());
-            
-            patientRepository.findById(app.getPatientId()).ifPresent(p -> map.put("patient", Map.of("id", p.getId(), "fullName", p.getFullName())));
-            doctorRepository.findById(app.getDoctorId()).ifPresent(d -> map.put("doctor", Map.of("id", d.getId(), "fullName", d.getFullName())));
+            map.put("symptoms", app.getSymptoms());
+            map.put("cancelReason", app.getCancelReason());
+            map.put("noShowReason", app.getNoShowReason());
+            map.put("checkedInAt", app.getCheckedInAt());
+            map.put("scheduleId", app.getScheduleId());
+
+            if (app.getScheduleId() != null)
+                scheduleRepository.findById(app.getScheduleId()).ifPresent(s -> {
+                    map.put("scheduledStartTime", s.getStartTime());
+                    map.put("scheduledEndTime", s.getEndTime());
+                });
+            if (app.getPatientId() != null)
+                patientRepository.findById(app.getPatientId()).ifPresent(p -> map.put("patient", Map.of("id", p.getId(), "fullName", p.getFullName())));
+            if (app.getDoctorId() != null)
+                doctorRepository.findById(app.getDoctorId()).ifPresent(d -> map.put("doctor", Map.of("id", d.getId(), "fullName", d.getFullName())));
 
             return map;
         }).collect(Collectors.toList());
@@ -614,9 +638,24 @@ public class AdminController {
     @PutMapping("/appointments/{id}/status")
     public ResponseEntity<?> updateAppointmentStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
         return appointmentRepository.findById(id).map(app -> {
-            app.setStatus(body.get("status"));
+            String newStatus = body.get("status");
+            app.setStatus(newStatus);
             if (body.containsKey("cancelReason")) app.setCancelReason(body.get("cancelReason"));
+            if ("NO_SHOW".equals(newStatus) && body.containsKey("noShowReason"))
+                app.setNoShowReason(body.get("noShowReason"));
             return ResponseEntity.ok(Map.of("message", "Cập nhật trạng thái thành công!", "data", appointmentRepository.save(app)));
+        }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // Bệnh nhân đến muộn: ghi nhận thời điểm thực tế đến
+    @PatchMapping("/appointments/{id}/check-in")
+    public ResponseEntity<?> checkInLate(@PathVariable Long id) {
+        return appointmentRepository.findById(id).map(app -> {
+            if (!"PENDING".equals(app.getStatus()))
+                return ResponseEntity.badRequest().body(Map.of("message", "Chỉ có thể check-in lịch hẹn đang ở trạng thái Chờ khám!"));
+            app.setCheckedInAt(LocalDateTime.now());
+            appointmentRepository.save(app);
+            return ResponseEntity.ok(Map.of("message", "Check-in muộn thành công! Bệnh nhân sẽ được xếp vào cuối hàng đợi."));
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -684,17 +723,19 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<MedicalRecord> recordPage = medicalRecordRepository.searchMedicalRecords(doctorId, patientId, date, pageable);
+        Page<MedicalRecord> recordPage = medicalRecordRepository.findAll(pageable);
 
         List<Map<String, Object>> responseList = recordPage.getContent().stream().map(record -> {
             Map<String, Object> map = new HashMap<>();
             map.put("id", record.getId());
             map.put("diagnosis", record.getDiagnosis());
-            appointmentRepository.findById(record.getAppointmentId()).ifPresent(app -> {
-                map.put("appointmentDate", app.getAppointmentDate());
-                patientRepository.findById(app.getPatientId()).ifPresent(p -> map.put("patientName", p.getFullName()));
-                doctorRepository.findById(app.getDoctorId()).ifPresent(d -> map.put("doctorName", d.getFullName()));
-            });
+            if (record.getAppointmentId() != null) {
+                appointmentRepository.findById(record.getAppointmentId()).ifPresent(app -> {
+                    map.put("appointmentDate", app.getAppointmentDate());
+                    if (app.getPatientId() != null) patientRepository.findById(app.getPatientId()).ifPresent(p -> map.put("patientName", p.getFullName()));
+                    if (app.getDoctorId()  != null) doctorRepository.findById(app.getDoctorId()).ifPresent(d -> map.put("doctorName", d.getFullName()));
+                });
+            }
             return map;
         }).collect(Collectors.toList());
 
@@ -707,12 +748,13 @@ public class AdminController {
             Map<String, Object> details = new HashMap<>();
             details.put("record", record);
 
-            // Kéo thông tin bệnh nhân và bác sĩ từ Appointment
-            appointmentRepository.findById(record.getAppointmentId()).ifPresent(app -> {
-                details.put("appointment", app);
-                patientRepository.findById(app.getPatientId()).ifPresent(p -> details.put("patient", p));
-                doctorRepository.findById(app.getDoctorId()).ifPresent(d -> details.put("doctor", d));
-            });
+            if (record.getAppointmentId() != null) {
+                appointmentRepository.findById(record.getAppointmentId()).ifPresent(app -> {
+                    details.put("appointment", app);
+                    if (app.getPatientId() != null) patientRepository.findById(app.getPatientId()).ifPresent(p -> details.put("patient", p));
+                    if (app.getDoctorId()  != null) doctorRepository.findById(app.getDoctorId()).ifPresent(d -> details.put("doctor", d));
+                });
+            }
 
             // Kéo đơn thuốc và chi tiết thuốc
             List<Map<String, Object>> prescriptionsList = prescriptionRepository.findByMedicalRecordId(record.getId()).stream().map(pres -> {
@@ -744,7 +786,7 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<Invoice> invoicePage = invoiceRepository.searchInvoices(status, paymentMethod, doctorId, date, pageable);
+        Page<Invoice> invoicePage = invoiceRepository.findAll(pageable);
 
         List<Map<String, Object>> responseList = invoicePage.getContent().stream().map(invoice -> {
             Map<String, Object> map = new HashMap<>();
@@ -754,11 +796,15 @@ public class AdminController {
             map.put("paymentMethod", invoice.getPaymentMethod());
             map.put("createdAt", invoice.getCreatedAt());
             
-            appointmentRepository.findById(invoice.getAppointmentId()).ifPresent(app -> {
-                map.put("appointmentDate", app.getAppointmentDate());
-                doctorRepository.findById(app.getDoctorId()).ifPresent(d -> map.put("doctorName", d.getFullName()));
-                patientRepository.findById(app.getPatientId()).ifPresent(p -> map.put("patientName", p.getFullName()));
-            });
+            if (invoice.getAppointmentId() != null) {
+                appointmentRepository.findById(invoice.getAppointmentId()).ifPresent(app -> {
+                    map.put("appointmentDate", app.getAppointmentDate());
+                    if (app.getDoctorId() != null)
+                        doctorRepository.findById(app.getDoctorId()).ifPresent(d -> map.put("doctorName", d.getFullName()));
+                    if (app.getPatientId() != null)
+                        patientRepository.findById(app.getPatientId()).ifPresent(p -> map.put("patientName", p.getFullName()));
+                });
+            }
             return map;
         }).collect(Collectors.toList());
 
@@ -769,12 +815,24 @@ public class AdminController {
     public ResponseEntity<?> getInvoiceDetails(@PathVariable Long id) {
         return invoiceRepository.findById(id).map(invoice -> {
             Map<String, Object> details = new HashMap<>();
-            details.put("invoice", invoice); // Bao gồm phí khám, dịch vụ, thuốc
-            appointmentRepository.findById(invoice.getAppointmentId()).ifPresent(app -> {
-                details.put("appointment", app);
-                doctorRepository.findById(app.getDoctorId()).ifPresent(d -> details.put("doctor", d));
-                patientRepository.findById(app.getPatientId()).ifPresent(p -> details.put("patient", p));
-            });
+            // Map tường minh để kiểm soát tên field (servicesFee → serviceFee cho FE)
+            Map<String, Object> invoiceMap = new HashMap<>();
+            invoiceMap.put("id",              invoice.getId());
+            invoiceMap.put("status",          invoice.getStatus());
+            invoiceMap.put("paymentMethod",   invoice.getPaymentMethod());
+            invoiceMap.put("consultationFee", invoice.getConsultationFee());
+            invoiceMap.put("serviceFee",      invoice.getServicesFee());
+            invoiceMap.put("medicineFee",     invoice.getMedicineFee());
+            invoiceMap.put("totalAmount",     invoice.getTotalAmount());
+            invoiceMap.put("createdAt",       invoice.getCreatedAt());
+            details.put("invoice", invoiceMap);
+
+            if (invoice.getAppointmentId() != null) {
+                appointmentRepository.findById(invoice.getAppointmentId()).ifPresent(app -> {
+                    if (app.getDoctorId()  != null) doctorRepository.findById(app.getDoctorId()).ifPresent(d -> details.put("doctor", d));
+                    if (app.getPatientId() != null) patientRepository.findById(app.getPatientId()).ifPresent(p -> details.put("patient", p));
+                });
+            }
             return ResponseEntity.ok(Map.of("data", details));
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -809,7 +867,7 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<Review> reviewPage = reviewRepository.searchReviews(doctorId, rating, pageable);
+        Page<Review> reviewPage = reviewRepository.findAll(pageable);
 
         List<Map<String, Object>> responseList = reviewPage.getContent().stream().map(review -> {
             Map<String, Object> map = new HashMap<>();
@@ -817,9 +875,11 @@ public class AdminController {
             map.put("rating", review.getRating());
             map.put("comment", review.getComment());
             map.put("createdAt", review.getCreatedAt());
-            
-            doctorRepository.findById(review.getDoctorId()).ifPresent(d -> map.put("doctorName", d.getFullName()));
-            patientRepository.findById(review.getPatientId()).ifPresent(p -> map.put("patientName", p.getFullName()));
+            map.put("doctorId", review.getDoctorId());
+            map.put("patientId", review.getPatientId());
+
+            if (review.getDoctorId()  != null) doctorRepository.findById(review.getDoctorId()).ifPresent(d -> map.put("doctorName", d.getFullName()));
+            if (review.getPatientId() != null) patientRepository.findById(review.getPatientId()).ifPresent(p -> map.put("patientName", p.getFullName()));
             return map;
         }).collect(Collectors.toList());
 
@@ -884,6 +944,7 @@ public class AdminController {
         
         // Nhóm số lượng lịch hẹn theo Bác sĩ
         Map<Long, Long> byDoctor = appointments.stream()
+            .filter(a -> a.getDoctorId() != null)
             .collect(Collectors.groupingBy(Appointment::getDoctorId, Collectors.counting()));
             
         List<Map<String, Object>> doctorStats = byDoctor.entrySet().stream().map(e -> {

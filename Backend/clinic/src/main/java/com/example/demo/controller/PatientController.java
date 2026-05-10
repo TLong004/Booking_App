@@ -35,8 +35,14 @@ public class PatientController {
     // 2. Tạo mới hồ sơ khám bệnh (ví dụ: tạo cho người thân)
     @PostMapping
     public ResponseEntity<?> createProfile(@RequestBody Patient patient) {
-        patient.setUserId(getCurrentUserId());
-        return ResponseEntity.ok(patientRepository.save(patient));
+        try {
+            patient.setUserId(getCurrentUserId());
+            Patient saved = patientRepository.save(patient);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("message", "Lỗi tạo hồ sơ: " + e.getMessage()));
+        }
     }
 
     // 3. Sửa hồ sơ khám bệnh
@@ -49,6 +55,8 @@ public class PatientController {
             patient.setDob(patientDetails.getDob());
             patient.setGender(patientDetails.getGender());
             patient.setAddress(patientDetails.getAddress());
+            patient.setPhoneNumber(patientDetails.getPhoneNumber());
+            patient.setCccd(patientDetails.getCccd());
             return ResponseEntity.ok(patientRepository.save(patient));
         }
         return ResponseEntity.status(403).body(Map.of("message", "Không tìm thấy hồ sơ hoặc bạn không có quyền sửa!"));

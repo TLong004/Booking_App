@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/pages/login_register/forgot_password_page.dart';
-import 'package:myapp/services/bloc/auth_bloc.dart';
+import 'package:myapp/logic/auth/auth_bloc.dart';
 import 'package:myapp/pages/login_register/register_screen.dart';
 import 'package:myapp/pages/login_register/widgets/modern_input.dart';
 import 'package:myapp/pages/login_register/widgets/social_button.dart';

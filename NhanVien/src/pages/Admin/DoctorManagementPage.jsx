@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { doctorApi } from '../../api/doctorApi';
 import { adminApi } from '../../api/adminApi';
 import DataTable from './DataTable';
 import Modal from './Modal';
@@ -9,7 +8,7 @@ import './AdminDashboard.css';
 const DEGREES = ['Bác sĩ', 'Thạc sĩ', 'Tiến sĩ', 'Phó giáo sư', 'Giáo sư'];
 
 const fmt = (v) =>
-  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v);
+  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v ?? 0);
 
 const EMPTY_FORM = {
   fullName: '', degree: 'Bác sĩ', specialtyId: '',
@@ -26,18 +25,21 @@ const DoctorManagementPage = () => {
   const [isOpen, setIsOpen]       = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm]           = useState(EMPTY_FORM);
+  const [apiError, setApiError]   = useState('');
 
+  // ── Data queries ──────────────────────────────────────────────────────
   const { data: doctorsRes, isLoading, error } = useQuery({
-    queryKey: ['doctors'],
-    queryFn: doctorApi.getAll,
+    queryKey: ['admin-doctors'],
+    queryFn: adminApi.getAllDoctors,
   });
   const { data: specialtiesRes } = useQuery({
-    queryKey: ['specialties'],
+    queryKey: ['admin-specialties'],
     queryFn: adminApi.getAllSpecialties,
   });
 
-  const doctors    = doctorsRes?.data ?? [];
-  const specialties = specialtiesRes?.data ?? [];
+  // BE trả về paginated response → lấy .data.data
+  const doctors    = doctorsRes?.data?.data ?? [];
+  const specialties = specialtiesRes?.data?.data ?? [];
 
   const filtered = useMemo(() => {
     return doctors.filter(d => {
@@ -49,24 +51,38 @@ const DoctorManagementPage = () => {
     });
   }, [doctors, search, filterSpec, filterDegree]);
 
+  // ── Mutations ─────────────────────────────────────────────────────────
   const createMutation = useMutation({
-    mutationFn: doctorApi.create,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['doctors'] }); closeModal(); },
+    mutationFn: adminApi.createDoctor,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-doctors'] });
+      closeModal();
+    },
+    onError: (err) => setApiError(err.response?.data?.message || 'Thêm bác sĩ thất bại!'),
   });
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => doctorApi.update(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['doctors'] }); closeModal(); },
+    mutationFn: ({ id, data }) => adminApi.updateDoctor(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-doctors'] });
+      closeModal();
+    },
+    onError: (err) => setApiError(err.response?.data?.message || 'Cập nhật thất bại!'),
   });
   const deleteMutation = useMutation({
-    mutationFn: doctorApi.delete,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['doctors'] }),
+    mutationFn: adminApi.deleteDoctor,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-doctors'] }),
   });
 
-  const openAdd = () => { setForm(EMPTY_FORM); setEditingId(null); setIsOpen(true); };
+  const openAdd = () => {
+    setForm(EMPTY_FORM);
+    setEditingId(null);
+    setApiError('');
+    setIsOpen(true);
+  };
 
   const openEdit = (doc) => {
     setForm({
-      fullName:        doc.fullName,
+      fullName:        doc.fullName ?? '',
       degree:          doc.degree ?? 'Bác sĩ',
       specialtyId:     doc.specialty?.id ?? '',
       roomNumber:      doc.roomNumber ?? '',
@@ -74,10 +90,11 @@ const DoctorManagementPage = () => {
       bio:             doc.bio ?? '',
     });
     setEditingId(doc.id);
+    setApiError('');
     setIsOpen(true);
   };
 
-  const closeModal = () => { setIsOpen(false); setEditingId(null); };
+  const closeModal = () => { setIsOpen(false); setEditingId(null); setApiError(''); };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,7 +103,12 @@ const DoctorManagementPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const payload = { ...form, consultationFee: Number(form.consultationFee) || 0 };
+    setApiError('');
+    const payload = {
+      ...form,
+      specialtyId:     form.specialtyId ? Number(form.specialtyId) : null,
+      consultationFee: Number(form.consultationFee) || 0,
+    };
     if (editingId) updateMutation.mutate({ id: editingId, data: payload });
     else createMutation.mutate(payload);
   };
@@ -111,21 +133,29 @@ const DoctorManagementPage = () => {
       header: 'Họ và tên', accessor: 'fullName', width: '22%',
       cell: r => <strong>{r.fullName}</strong>,
     },
-    { header: 'Học vị',      accessor: 'degree',         width: '12%' },
+    { header: 'Học vị', accessor: 'degree', width: '12%' },
     {
-      header: 'Chuyên khoa', accessor: 'specialty.name', width: '16%',
+      header: 'Chuyên khoa', accessor: 'specialty', width: '16%',
       cell: r => r.specialty?.name
         ? <span className="badge badge-blue">{r.specialty.name}</span>
         : <span className="text-muted">—</span>,
     },
-    { header: 'Phòng',       accessor: 'roomNumber',      width: '10%' },
+    { header: 'Phòng', accessor: 'roomNumber', width: '10%' },
     {
       header: 'Phí khám', accessor: 'consultationFee', width: '16%',
-      cell: r => <span className="text-green">{fmt(r.consultationFee ?? 0)}</span>,
+      cell: r => <span className="text-green">{fmt(r.consultationFee)}</span>,
     },
     {
-      header: 'Tiểu sử', accessor: 'bio', width: '24%',
-      cell: r => <span style={{ color: '#6b7280' }}>{r.bio || '—'}</span>,
+      header: 'Trạng thái TK', accessor: 'user', width: '14%',
+      cell: r => r.user
+        ? <span className={`badge ${r.user.isActive ? 'badge-green' : 'badge-red'}`}>
+            {r.user.isActive ? 'Hoạt động' : 'Vô hiệu'}
+          </span>
+        : <span className="text-muted">—</span>,
+    },
+    {
+      header: 'Tiểu sử', accessor: 'bio', width: '10%',
+      cell: r => <span style={{ color: '#6b7280' }}>{r.bio ? '✓' : '—'}</span>,
     },
   ];
 
@@ -155,7 +185,7 @@ const DoctorManagementPage = () => {
       </div>
 
       {isLoading && <p style={{ color: '#6b7280', fontSize: 13 }}>Đang tải...</p>}
-      {error && <p className="error-message">Lỗi: {error.message}</p>}
+      {error    && <p className="error-message">Lỗi: {error.message}</p>}
 
       <DataTable
         columns={columns}
@@ -174,6 +204,8 @@ const DoctorManagementPage = () => {
         title={editingId ? 'Sửa thông tin bác sĩ' : 'Thêm bác sĩ mới'}
       >
         <form onSubmit={handleSubmit} className="admin-form">
+          {apiError && <p className="error-message" style={{ marginBottom: 10 }}>{apiError}</p>}
+
           <div className="form-group">
             <label>Họ và tên *</label>
             <input

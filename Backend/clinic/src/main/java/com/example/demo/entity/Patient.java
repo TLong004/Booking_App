@@ -23,6 +23,14 @@ public class Patient {
     private String gender;
     private String address;
 
+    @Column(name = "is_owner")
+    private Boolean isOwner = false;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    private String cccd;
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 }

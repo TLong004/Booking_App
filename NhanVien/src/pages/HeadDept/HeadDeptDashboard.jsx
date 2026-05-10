@@ -1,8 +1,8 @@
 import React from 'react';
 import { Routes, Route, Navigate, NavLink, useLocation } from 'react-router-dom';
-import OverviewTab from './components/OverviewTab';
-import ScheduleTab from './components/ScheduleTab';
-import AnalyticsTab from './components/AnalyticsTab';
+import OverviewTab from './OverviewTab';
+import ScheduleTab from './ScheduleTab';
+import AnalyticsTab from './AnalyticsTab';
 import { DOCS, now } from './headDeptData';
 import './HeadDeptDashboard.css';
 

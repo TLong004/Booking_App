@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/pages/home/screens/doctor_screen.dart';
 
 class DoctorCard extends StatelessWidget {
   final String name;
@@ -66,38 +65,6 @@ class DoctorCard extends StatelessWidget {
           ),
 
           const SizedBox(height: 10),
-          
-          SizedBox(
-            width: double.infinity,
-            height: 30,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DoctorProfileScreen(
-                      doctor: {
-                        'name': name,
-                        'hospital': 'Bệnh viện Đa khoa',
-                        'specialty': job,
-                        'rating': rating,
-                      },
-                    ),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: EdgeInsets.zero,
-              ),
-              child: const Text("Đặt lịch", style: TextStyle(fontSize: 12)),
-            ),
-          )
         ],
       ),
     );

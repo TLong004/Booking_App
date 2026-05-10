@@ -2,23 +2,32 @@ import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:8080/api', // Trỏ đúng về Backend Spring Boot
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: 'http://localhost:8080/api',
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Interceptor: Tự động gắn Token vào mọi Request gửi lên BE
 axiosClient.interceptors.request.use(
   (config) => {
-    // Lấy token trực tiếp từ trạng thái hiện tại của Zustand store
     const token = useAuthStore.getState().token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+axiosClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status;
+    const url    = error.config?.url;
+    console.error(`[API Error] ${status} ${url}`, error.response?.data);
+
+    if (status === 401 || status === 403) {
+      useAuthStore.getState().logout();
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
 );
 
 export default axiosClient;

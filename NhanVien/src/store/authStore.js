@@ -1,13 +1,16 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-// Quản lý trạng thái người dùng đăng nhập
-export const useAuthStore = create((set, get) => ({
-  user: null, // Lưu thông tin user: { id, username, roles: ['ROLE_DOCTOR'] }
-  token: null, // Lưu JWT token
-
-  // Hàm gọi khi đăng nhập thành công
-  login: (userData, token) => set({ user: userData, token }),
-
-  // Hàm gọi khi đăng xuất
-  logout: () => set({ user: null, token: null }),
-}));
+export const useAuthStore = create(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      login: (userData, token) => set({ user: userData, token }),
+      logout: () => set({ user: null, token: null }),
+    }),
+    {
+      name: 'clinic-auth', // key trong localStorage
+    }
+  )
+);

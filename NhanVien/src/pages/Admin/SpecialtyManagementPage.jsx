@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '../../api/adminApi';
-import { doctorApi } from '../../api/doctorApi';
 import DataTable from './DataTable';
 import Modal from './Modal';
 import './AdminDashboard.css';
@@ -15,18 +14,21 @@ const SpecialtyManagementPage = () => {
   const [isOpen, setIsOpen]       = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm]           = useState(EMPTY_FORM);
+  const [apiError, setApiError]   = useState('');
 
+  // ── Data queries ──────────────────────────────────────────────────────
   const { data: specialtiesRes, isLoading, error } = useQuery({
-    queryKey: ['specialties'],
+    queryKey: ['admin-specialties'],
     queryFn: adminApi.getAllSpecialties,
   });
   const { data: doctorsRes } = useQuery({
-    queryKey: ['doctors'],
-    queryFn: doctorApi.getAll,
+    queryKey: ['admin-doctors'],
+    queryFn: adminApi.getAllDoctors,
   });
 
-  const specialties = specialtiesRes?.data ?? [];
-  const doctors     = doctorsRes?.data ?? [];
+  // BE trả về paginated response → lấy .data.data
+  const specialties = specialtiesRes?.data?.data ?? [];
+  const doctors     = doctorsRes?.data?.data ?? [];
 
   const filtered = useMemo(() => {
     return specialties.filter(s =>
@@ -34,32 +36,47 @@ const SpecialtyManagementPage = () => {
     );
   }, [specialties, search]);
 
+  // ── Mutations ─────────────────────────────────────────────────────────
   const createMutation = useMutation({
     mutationFn: adminApi.createSpecialty,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['specialties'] }); closeModal(); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-specialties'] });
+      closeModal();
+    },
+    onError: (err) => setApiError(err.response?.data?.message || 'Thêm chuyên khoa thất bại!'),
   });
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => adminApi.updateSpecialty(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['specialties'] }); closeModal(); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-specialties'] });
+      closeModal();
+    },
+    onError: (err) => setApiError(err.response?.data?.message || 'Cập nhật thất bại!'),
   });
   const deleteMutation = useMutation({
     mutationFn: adminApi.deleteSpecialty,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['specialties'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-specialties'] }),
   });
 
-  const openAdd = () => { setForm(EMPTY_FORM); setEditingId(null); setIsOpen(true); };
+  const openAdd = () => {
+    setForm(EMPTY_FORM);
+    setEditingId(null);
+    setApiError('');
+    setIsOpen(true);
+  };
 
   const openEdit = (sp) => {
     setForm({
-      name:         sp.name,
+      name:         sp.name ?? '',
       description:  sp.description ?? '',
       headDoctorId: sp.headDoctor?.id ?? '',
     });
     setEditingId(sp.id);
+    setApiError('');
     setIsOpen(true);
   };
 
-  const closeModal = () => { setIsOpen(false); setEditingId(null); };
+  const closeModal = () => { setIsOpen(false); setEditingId(null); setApiError(''); };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,8 +85,13 @@ const SpecialtyManagementPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (editingId) updateMutation.mutate({ id: editingId, data: form });
-    else createMutation.mutate(form);
+    setApiError('');
+    const payload = {
+      ...form,
+      headDoctorId: form.headDoctorId ? Number(form.headDoctorId) : null,
+    };
+    if (editingId) updateMutation.mutate({ id: editingId, data: payload });
+    else createMutation.mutate(payload);
   };
 
   const handleDelete = (sp) => {
@@ -96,7 +118,7 @@ const SpecialtyManagementPage = () => {
     },
     {
       header: 'Số bác sĩ', accessor: 'doctorCount', width: '10%',
-      cell: r => <span className="text-center">{r.doctorCount ?? 0}</span>,
+      cell: r => <span style={{ display: 'block', textAlign: 'center' }}>{r.doctorCount ?? 0}</span>,
     },
   ];
 
@@ -118,7 +140,7 @@ const SpecialtyManagementPage = () => {
       </div>
 
       {isLoading && <p style={{ color: '#6b7280', fontSize: 13 }}>Đang tải...</p>}
-      {error && <p className="error-message">Lỗi: {error.message}</p>}
+      {error    && <p className="error-message">Lỗi: {error.message}</p>}
 
       <DataTable
         columns={columns}
@@ -137,6 +159,8 @@ const SpecialtyManagementPage = () => {
         title={editingId ? 'Sửa chuyên khoa' : 'Thêm chuyên khoa mới'}
       >
         <form onSubmit={handleSubmit} className="admin-form">
+          {apiError && <p className="error-message" style={{ marginBottom: 10 }}>{apiError}</p>}
+
           <div className="form-group">
             <label>Tên chuyên khoa *</label>
             <input

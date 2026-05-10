@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.List;
 
@@ -17,7 +16,8 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     @Query("SELECT p FROM Patient p WHERE p.deletedAt IS NULL AND " +
            "(:keyword IS NULL OR LOWER(p.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
-           "(:gender IS NULL OR p.gender = :gender) AND " +
-           "(:dob IS NULL OR p.dob = :dob)")
-    Page<Patient> searchPatients(@Param("keyword") String keyword, @Param("gender") String gender, @Param("dob") LocalDate dob, Pageable pageable);
+           "(:gender IS NULL OR p.gender = :gender)")
+    Page<Patient> searchPatients(@Param("keyword") String keyword, @Param("gender") String gender, Pageable pageable);
+
+    Page<Patient> findByDeletedAtIsNull(Pageable pageable);
 }

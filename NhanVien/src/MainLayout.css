@@ -1,109 +1,245 @@
+/* ================================================================
+   MainLayout.css — Sidebar + Header layout
+   ================================================================ */
+
 .layout-container {
   display: flex;
   min-height: 100vh;
-  background-color: #f8fafc; /* Lighter background */
+  background: #f0f4f8;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* ── Sidebar ─────────────────────────────────────────────────────── */
 .sidebar {
-  width: 250px;
-  background-color: #1e293b; /* Darker, modern sidebar */
-  color: white;
+  width: 248px;
+  background: linear-gradient(170deg, #0f2d3d 0%, #0c2434 55%, #09202f 100%);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: 2px 0 16px rgba(0,0,0,0.18);
 }
 
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+/* ── Logo ────────────────────────────────────────────────────────── */
 .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 24px;
+  padding: 0 16px;
   height: 64px;
-  font-size: 20px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(14,165,233,0.4);
+}
+
+.sidebar-logo-name {
+  font-size: 14px;
   font-weight: 700;
   color: #fff;
-  border-bottom: 1px solid #334155;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
+.sidebar-logo-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  font-weight: 400;
+  margin-top: 2px;
+  letter-spacing: 0.1px;
 }
 
-.sidebar-menu-title {
-  padding: 24px 24px 8px 24px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
+/* ── Nav ─────────────────────────────────────────────────────────── */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  padding: 8px 12px;
+  padding: 8px 10px 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-menu-title {
+  padding: 14px 8px 5px;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.22);
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  margin: 0;
 }
 
 .sidebar-nav a {
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: #cbd5e1;
+  gap: 10px;
+  color: rgba(255,255,255,0.48);
   text-decoration: none;
-  padding: 10px 12px;
-  margin-bottom: 4px;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 8px 10px;
+  margin-bottom: 1px;
+  border-radius: 9px;
+  font-size: 13px;
   font-weight: 500;
-  transition: all 0.2s ease-in-out;
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+  letter-spacing: -0.1px;
 }
 
-.sidebar-nav a:hover,
+.sidebar-nav a:hover {
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.88);
+}
+
 .sidebar-nav a.active {
-  background-color: #334155;
-  color: #ffffff;
+  background: rgba(14,165,233,0.16);
+  color: #7dd3fc;
+  font-weight: 600;
 }
 
+.sidebar-nav a.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  background: linear-gradient(180deg, #38bdf8, #2563eb);
+  border-radius: 0 3px 3px 0;
+}
+
+.sidebar-nav a svg { flex-shrink: 0; opacity: 0.55; transition: opacity 0.15s; }
+.sidebar-nav a:hover svg,
+.sidebar-nav a.active svg { opacity: 1; }
+
+/* ── Main content ────────────────────────────────────────────────── */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  min-width: 0;
 }
 
+/* ── Top header ──────────────────────────────────────────────────── */
 .top-header {
-  background-color: white;
-  height: 64px;
+  background: #fff;
+  height: 58px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 0 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e9edf2;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 1px 4px rgba(15,23,42,0.05);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-breadcrumb {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.header-sep {
+  color: #cbd5e1;
+  font-size: 13px;
+}
+
+.header-page-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: -0.2px;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 15px;
-  color: #475569;
-  font-size: 14px;
+  gap: 10px;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.1;
+}
+
+.user-role-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #0ea5e9;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0f2d3d, #1d4e6e);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 2px solid #e2e8f0;
 }
 
 .logout-btn {
-  background-color: #f1f5f9;
-  color: #475569;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 6px;
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+  padding: 5px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
-
 .logout-btn:hover {
-  background-color: #ef4444;
-  color: white;
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #e11d48;
 }
 
+/* ── Page content ────────────────────────────────────────────────── */
 .page-content {
-  padding: 24px;
+  padding: 22px 24px;
   flex: 1;
   overflow-y: auto;
 }

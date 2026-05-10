@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/pages/login_register/login_screen.dart';
 import 'package:myapp/pages/login_register/widgets/modern_input.dart';
 import 'package:myapp/pages/login_register/widgets/social_button.dart';
-import 'package:myapp/services/bloc/auth_bloc.dart';
+import 'package:myapp/logic/auth/auth_bloc.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

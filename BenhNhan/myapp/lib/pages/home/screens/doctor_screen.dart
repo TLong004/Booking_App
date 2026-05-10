@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/models/doctor.dart';
 import 'package:myapp/pages/home/screens/booking_screen.dart';
 
 class DoctorProfileScreen extends StatelessWidget {
-  final Map<String, dynamic> doctor;
+  final DoctorModel doctor;
 
   const DoctorProfileScreen({super.key, required this.doctor});
 
@@ -60,7 +61,7 @@ class DoctorProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        "Bác sĩ có hơn 10 năm kinh nghiệm trong lĩnh vực ${doctor['specialty']}. Từng công tác và giữ các chức vụ quan trọng tại ${doctor['hospital']}. Bác sĩ nổi tiếng với sự tận tâm và phương pháp điều trị hiện đại, giúp hàng nghìn bệnh nhân hồi phục nhanh chóng.",
+                        "Bác sĩ có hơn 10 năm kinh nghiệm trong lĩnh vực. Từng công tác và giữ các chức vụ quan trọng tại. Bác sĩ nổi tiếng với sự tận tâm và phương pháp điều trị hiện đại, giúp hàng nghìn bệnh nhân hồi phục nhanh chóng.",
                         style: TextStyle(
                           color: Colors.grey[700],
                           fontSize: 15,
@@ -118,7 +119,7 @@ class DoctorProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                doctor['name'],
+                doctor.fullName,
                 style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -129,7 +130,7 @@ class DoctorProfileScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  doctor['specialty'],
+                  "Khoa",
                   style: const TextStyle(
                     color: Color(0xFF00B4D8),
                     fontWeight: FontWeight.w600,
@@ -139,7 +140,7 @@ class DoctorProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                doctor['hospital'],
+                "Bệnh viện",
                 style: const TextStyle(color: Colors.grey, fontSize: 14),
               ),
             ],
@@ -155,7 +156,6 @@ class DoctorProfileScreen extends StatelessWidget {
       children: [
         _buildStatItem("10+", "Năm KN"),
         _buildStatItem("2.5k+", "Bệnh nhân"),
-        _buildStatItem(doctor['rating'].toString(), "Đánh giá"),
       ],
     );
   }
@@ -212,7 +212,7 @@ class DoctorProfileScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(doctor['hospital'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text("Bệnh viên", style: const TextStyle(fontWeight: FontWeight.bold)),
                 const Text("Thành phố Thái Bình, Việt Nam", style: TextStyle(color: Colors.grey, fontSize: 12)),
               ],
             ),

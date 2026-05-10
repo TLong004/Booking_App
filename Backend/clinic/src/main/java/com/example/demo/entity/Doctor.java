@@ -21,7 +21,7 @@ public class Doctor {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    private String degree; // Thạc sĩ, Tiến sĩ, BSCK...
+    private String degree; 
 
     @Column(name = "room_number")
     private String roomNumber;
@@ -33,4 +33,9 @@ public class Doctor {
 
     @Column(name = "avatar_url")
     private String avatarUrl;
+
+    private Double rating;
+
+    @Transient
+    private String specialtyName;
 }

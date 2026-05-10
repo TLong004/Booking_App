@@ -1,5 +1,5 @@
 import React from 'react';
-import { DOCS } from '../headDeptData';
+import { DOCS } from './headDeptData';
 import { StatCard, Avatar, ShiftTag, AlertRow } from './SharedUI';
 
 export default function OverviewTab() {
